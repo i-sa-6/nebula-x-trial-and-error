@@ -1,14 +1,22 @@
-# Python
-backend/.venv/
+# Ignore raw hackathon datasets
+PS3/02_Datasets/
+
+# Python temporary files
 __pycache__/
 *.pyc
 
-# Environment variables
+# Virtual environments
+.venv/
+venv/
+
+# Environment files
 .env
 
-# Node
-frontend/node_modules/
-frontend/dist/
+# macOS files
+.DS_Store
 
-# IDE
+# VS Code settings
 .vscode/
+
+# Generated predictions
+shm_predictions.csv
