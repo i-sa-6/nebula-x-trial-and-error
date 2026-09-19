@@ -868,4 +868,55 @@ body::before {
   box-shadow: 0 0 8px var(--primary-glow);
 }
 
+/* ==========================================================================
+   ELI5 (Explain Like I'm 5) Callouts
+   ========================================================================== */
+.eli5-box {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px dashed rgba(0, 240, 255, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  margin-top: 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-size: 0.825rem;
+  line-height: 1.55;
+  color: #e2e8f0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.eli5-box:hover {
+  border-color: var(--primary);
+  background: rgba(30, 41, 59, 0.6);
+}
+
+.eli5-badge {
+  font-size: 0.675rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: #000;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.eli5-text {
+  flex: 1;
+}
+
+.eli5-text strong {
+  color: var(--primary);
+}
+
+.eli5-text em {
+  font-style: italic;
+  color: #fbbf24;
+}
+
+
 

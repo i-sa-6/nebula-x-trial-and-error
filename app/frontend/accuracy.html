@@ -83,12 +83,31 @@
       </div>
     </div>
 
+    <!-- ELI5 Simple Explanation for Overall Score -->
+    <div class="eli5-box">
+      <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
+      <div class="eli5-text">
+        <strong>What is this score?</strong> Think of this as the <strong>AI Train Doctor's Report Card</strong>! 
+        <strong>Macro F1 (0.8507)</strong> is our competition grade. Because 86% of train tracks are naturally healthy, a lazy robot could just guess "Normal" every time and pretend to be smart. Macro F1 forces the AI to prove it can catch the rare, dangerous bumpy tracks on both the Left and Right rails without cheating!
+      </div>
+    </div>
+
     <!-- SECTION 1: TRAINING DATA PERFORMANCE (5-FOLD CV) -->
     <section class="glass-panel">
       <div class="panel-header">
         <div>
           <h3>1. TRAINING SET PERFORMANCE (5-FOLD STRATIFIED CROSS-VALIDATION)</h3>
           <p class="panel-desc">Rigorous out-of-fold validation on all 272 ground-truth files (234 Normal, 14 Side I, 24 Side II) avoiding synthetic data contamination.</p>
+        </div>
+      </div>
+
+      <!-- ELI5 Simple Explanation for Training Cross-Validation -->
+      <div class="eli5-box" style="margin-bottom: 1.25rem;">
+        <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
+        <div class="eli5-text">
+          <strong>What is 5-Fold Cross-Validation?</strong> It's like giving the AI <strong>5 surprise practice quizzes</strong>! 
+          We hid 20% of the train rides, asked the AI to guess the track condition, and graded it. It got <strong>95.59%</strong> of all trips right! 
+          The <strong>Confusion Matrix</strong> below is the answer key: green boxes are direct hits (229 healthy tracks and 31 bumpy tracks caught accurately).
         </div>
       </div>
 
@@ -258,6 +277,16 @@
         <div>
           <h3>2. HELD-OUT TEST SET PERFORMANCE (68 TEST FILES)</h3>
           <p class="panel-desc">Automated condition monitoring predictions for Test1.csv to Test68.csv packaged in official predictions.zip.</p>
+        </div>
+      </div>
+
+      <!-- ELI5 Simple Explanation for Test Set -->
+      <div class="eli5-box" style="margin-bottom: 1.5rem;">
+        <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
+        <div class="eli5-text">
+          <strong>What is the Test Set?</strong> The <strong>Final Exam</strong>! 
+          These are 68 brand new, mystery train rides where nobody gave the AI the answers beforehand. 
+          Our AI listened to all 68 files in a split second, found that <strong>60 tracks are smooth & safe</strong>, and flagged <strong>8 tracks with bad corrugation waves</strong> (4 on Left Rail, 4 on Right Rail) so maintenance crews know exactly where to send the repair train! Click <em>Inspect in Digital Twin ↗</em> on any row below to watch it play live on the toy train!
         </div>
       </div>
 
