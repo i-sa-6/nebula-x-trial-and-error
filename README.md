@@ -55,12 +55,17 @@ True Side II  :           1                  2                 21
 │   │   ├── server.py              # Zero-dependency HTTP API + SSE token streaming server
 │   │   └── gemini_streamer.py     # generateContentStream integration for AI advisory
 │   ├── frontend/
-│   │   ├── index.html             # Live 8-Car Train Digital Twin & Streaming Recommendations
-│   │   ├── accuracy.html          # Dedicated Model Accuracy & Benchmark Explorer
-│   │   ├── app.js                 # Dashboard controller & SSE stream consumer
+│   │   ├── index.html             # Fleet Predictions & Triage Dashboard (Landing Page)
+│   │   ├── landing.js             # Predictions table controller, filters & CSV upload handler
+│   │   ├── twin.html              # Live 8-Car Train Digital Twin & Streaming Recommendations
+│   │   ├── accuracy.html          # Dedicated Model Accuracy & Benchmark Explorer (linked to GitHub)
+│   │   ├── app.js                 # Train schematic & SSE stream consumer
 │   │   ├── accuracy.js            # Interactive 68 test files filter & metrics controller
 │   │   └── style.css              # GPU-composited high-tech glassmorphic design system
-│   └── run_app.py                 # Web application launcher
+│   └── run_app.py                 # Web application launcher (supports local $PORT & Cloud Run)
+├── Dockerfile                     # Optimized container definition for Google Cloud Run
+├── cloudbuild.yaml                # Automated Google Cloud Build CI/CD deployment pipeline
+├── deploy_gcp.sh                  # Automated Google Cloud deployment engine
 ├── data/
 │   ├── Train_Labels.csv           # Ground-truth training labels (272 recordings)
 │   └── train_features.csv         # Pre-extracted 134 physical features for fast training
@@ -86,6 +91,17 @@ True Side II  :           1                  2                 21
 
 ---
 
+## ☁️ Google Cloud Deployment (NebulaX Rule Compliance)
+
+The entire application is containerized and deployed on **Google Cloud Run** in accordance with NebulaX judging requirements:
+
+- 🌐 **Live Cloud Service**: [https://nebula-rail-twin-863881211691.asia-southeast1.run.app](https://nebula-rail-twin-863881211691.asia-southeast1.run.app)
+- **GCP Region**: `asia-southeast1` (Singapore)
+- **Container Registry**: `gcr.io/qwiklabs-gcp-01-c57489cc9b86/nebula-rail-twin:latest`
+- **One-Click Deploy**: `./deploy_gcp.sh`
+
+---
+
 ## 🚀 Quickstart & Usage
 
 ### 1. Launch the Live Interactive Web Application
@@ -93,8 +109,9 @@ True Side II  :           1                  2                 21
 python3 app/run_app.py 8080
 ```
 Open your browser at:
-- **Live Diagnostic Twin**: [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
-- **Model Accuracy & Test Set Explorer**: [http://127.0.0.1:8080/accuracy.html](http://127.0.0.1:8080/accuracy.html)
+- **Fleet Predictions & Triage (Landing Page)**: [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
+- **Live 8-Car Diagnostic Twin**: [http://127.0.0.1:8080/twin.html](http://127.0.0.1:8080/twin.html)
+- **Model Accuracy Explorer**: [http://127.0.0.1:8080/accuracy.html](http://127.0.0.1:8080/accuracy.html)
 
 *(Binding to `127.0.0.1` bypasses macOS IPv6 DNS resolution latency for instant 0ms responses).*
 
