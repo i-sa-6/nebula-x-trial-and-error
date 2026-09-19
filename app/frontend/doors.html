@@ -37,6 +37,10 @@
         <span class="pill-label">SAMPLING RATE</span>
         <span class="pill-value" style="color: var(--primary);">50 Hz</span>
       </div>
+      <input type="file" id="doorsFileInput" accept=".csv" style="display: none;">
+      <button id="btnUploadDoors" class="btn btn-primary" title="Upload continuous 50Hz door current telemetry CSV to run automated segmentation and resistance triage">
+        <span class="btn-icon">📤</span> Upload Telemetry CSV
+      </button>
       <a href="/api/download_master_submission" class="btn btn-success" title="Download official submission package containing all 4 model CSVs">
         <span class="btn-icon">📦</span> Master ZIP
       </a>
@@ -49,7 +53,7 @@
     <!-- Sub-Tabs Switcher -->
     <div class="sub-tabs-container">
       <button class="sub-tab-btn active" data-target="pane-predictions">
-        <span>📋</span> Predictions Overview (38 Segmented Door Cycles)
+        <span>📋</span> <span id="doorsTabTitle">Predictions Overview (38 Segmented Door Cycles)</span>
       </button>
       <button class="sub-tab-btn" data-target="pane-analysis">
         <span>📊</span> Model Analysis &amp; Benchmark (Random Forest / LogReg)
@@ -120,9 +124,10 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
           <div class="filter-group">
             <span class="filter-label">Filter Cycles:</span>
-            <button class="filter-btn active" data-filter="all">All (38)</button>
-            <button class="filter-btn" data-filter="normal" style="color: var(--color-normal);">Normal (30)</button>
-            <button class="filter-btn" data-filter="abnormal" style="color: var(--color-danger);">Abnormal Resistance (8)</button>
+            <button class="filter-btn active" data-filter="all">All (<span id="countAllDoors">38</span>)</button>
+            <button class="filter-btn" data-filter="normal" style="color: var(--color-normal);">Normal (<span id="countNormalDoors">30</span>)</button>
+            <button class="filter-btn" data-filter="abnormal" style="color: var(--color-danger);">Abnormal Resistance (<span id="countAbnormalDoors">8</span>)</button>
+            <button class="filter-btn" data-filter="uploaded" id="btnFilterUploadedDoors" style="display: none; color: #a855f7;">📤 Uploaded (<span id="countUploadedDoors">0</span>)</button>
           </div>
           <div>
             <input type="text" id="doorSearchInput" placeholder="Filter cycle ID..." class="styled-input" style="padding: 0.45rem 1rem; width: 180px; font-size: 0.85rem;">

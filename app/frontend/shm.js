@@ -78,25 +78,100 @@ async function fetchShmPredictions() {
     const data = await res.json();
     shmPredictionsData = data;
 
-    // Populate KPIs
+    // Populate KPIs & Tab Title
     if (data.summary) {
       document.getElementById('shmKpiTotal').textContent = data.summary.total_files;
       document.getElementById('shmKpiLow').textContent = data.summary.low_risk;
       document.getElementById('shmKpiMed').textContent = data.summary.medium_risk;
       document.getElementById('shmKpiHigh').textContent = data.summary.high_risk;
       document.getElementById('shmKpiAvgD').textContent = data.summary.avg_damage_index.toFixed(4);
+      
+      const tabTitle = document.getElementById('shmTabTitle');
+      if (tabTitle) tabTitle.textContent = `Predictions Overview (${data.summary.total_files} Dynamic Stress Cases)`;
+
+      const cAll = document.getElementById('countAllShm');
+      const cLow = document.getElementById('countLowShm');
+      const cMed = document.getElementById('countMedShm');
+      const cHigh = document.getElementById('countHighShm');
+      if (cAll) cAll.textContent = data.summary.total_files;
+      if (cLow) cLow.textContent = data.summary.low_risk;
+      if (cMed) cMed.textContent = data.summary.medium_risk;
+      if (cHigh) cHigh.textContent = data.summary.high_risk;
+
+      const uploadedCount = (data.predictions || []).filter(p => p.is_uploaded).length;
+      const btnUp = document.getElementById('btnFilterUploadedShm');
+      const countUp = document.getElementById('countUploadedShm');
+      if (btnUp && countUp) {
+        countUp.textContent = uploadedCount;
+        btnUp.style.display = uploadedCount > 0 ? 'inline-block' : 'none';
+      }
     }
 
     renderTable();
     initFilters();
+    initShmUpload();
   } catch (err) {
     console.error('Failed to fetch SHM predictions:', err);
   }
 }
 
+function initShmUpload() {
+  const btnUpload = document.getElementById('btnUploadShm');
+  const fileInput = document.getElementById('shmFileInput');
+  if (!btnUpload || !fileInput || btnUpload._bound) return;
+  btnUpload._bound = true;
+
+  btnUpload.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      alert('Please select a valid single-column stress CSV file.');
+      return;
+    }
+
+    const origText = btnUpload.innerHTML;
+    btnUpload.disabled = true;
+    btnUpload.innerHTML = '<span class="btn-icon">⏳</span> Computing Rainflow...';
+
+    try {
+      const res = await fetch('/api/shm/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/csv',
+          'X-Filename': file.name
+        },
+        body: file
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        alert(`❌ SHM Analysis Failed:\n\n${data.error || 'Unknown error'}`);
+        return;
+      }
+
+      alert(`✅ Stress Telemetry Verified & Diagnosed!\n\nFile: ${data.prediction.file_id}\nDamage Index (D): ${data.prediction.damage_index}\nSeverity: ${data.prediction.severity}\nRemaining Life: ${Number(data.prediction.remaining_hours).toLocaleString()} hours`);
+      await fetchShmPredictions();
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert(`Upload request failed: ${err.message}`);
+    } finally {
+      btnUpload.disabled = false;
+      btnUpload.innerHTML = origText;
+      fileInput.value = '';
+    }
+  });
+}
+
 function initFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
   filterBtns.forEach(btn => {
+    if (btn._bound) return;
+    btn._bound = true;
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -106,7 +181,8 @@ function initFilters() {
   });
 
   const searchInput = document.getElementById('shmSearchInput');
-  if (searchInput) {
+  if (searchInput && !searchInput._bound) {
+    searchInput._bound = true;
     searchInput.addEventListener('input', () => renderTable());
   }
 }
@@ -136,9 +212,8 @@ function renderTable() {
   tbody.innerHTML = '';
 
   const filtered = shmPredictionsData.predictions.filter(item => {
-    // Severity filter — compare against the filter key derived from the API value
-    if (currentFilter !== 'all' && getSeverityFilter(item.severity) !== currentFilter) return false;
-    // Search filter
+    if (currentFilter === 'uploaded' && !item.is_uploaded) return false;
+    if (currentFilter !== 'all' && currentFilter !== 'uploaded' && getSeverityFilter(item.severity) !== currentFilter) return false;
     if (searchQuery && !item.file_id.toLowerCase().includes(searchQuery)) return false;
     return true;
   });

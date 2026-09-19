@@ -37,6 +37,10 @@
         <span class="pill-label">MRR SCORE</span>
         <span class="pill-value" style="color: var(--color-normal);">0.850</span>
       </div>
+      <input type="file" id="acvFileInput" accept=".xlsx,.csv" style="display: none;">
+      <button id="btnUploadAcv" class="btn btn-primary" title="Upload an .xlsx consist telemetry file to run live Elliptic Envelope car ranking">
+        <span class="btn-icon">📤</span> Upload Telemetry (.xlsx)
+      </button>
       <a href="/api/download_master_submission" class="btn btn-success" title="Download official submission package containing all 4 model CSVs">
         <span class="btn-icon">📦</span> Master ZIP
       </a>
@@ -49,7 +53,7 @@
     <!-- Sub-Tabs Switcher -->
     <div class="sub-tabs-container">
       <button class="sub-tab-btn active" data-target="pane-predictions">
-        <span>📋</span> Predictions Overview (6 Consist Cases)
+        <span>📋</span> <span id="acvTabTitle">Predictions Overview (Official Test Case + Consists)</span>
       </button>
       <button class="sub-tab-btn" data-target="pane-analysis">
         <span>📊</span> Model Analysis &amp; Benchmark (Robust Elliptic Envelope)
@@ -118,12 +122,16 @@
       <!-- Predictions Table -->
       <section class="glass-panel" style="padding: 1.5rem 2rem; margin-top: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">
-            Consist Case Diagnostic Predictions &amp; Car Sequence Ranking
-          </h3>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">
-            Output Format Compliant: <code>file_id,ranked_cars</code>
-          </span>
+          <div class="filter-group">
+            <span class="filter-label">Filter Cases:</span>
+            <button class="filter-btn active" data-filter="all">All (<span id="countAllAcv">6</span>)</button>
+            <button class="filter-btn" data-filter="test" style="color: #38bdf8;">Official Test Case (<span id="countTestAcv">1</span>)</button>
+            <button class="filter-btn" data-filter="train" style="color: var(--color-normal);">Consist Evaluations (<span id="countTrainAcv">5</span>)</button>
+            <button class="filter-btn" data-filter="uploaded" id="btnFilterUploadedAcv" style="display: none; color: #a855f7;">📤 Uploaded (<span id="countUploadedAcv">0</span>)</button>
+          </div>
+          <div>
+            <input type="text" id="acvSearchInput" placeholder="Search case or car..." class="styled-input" style="padding: 0.45rem 1rem; width: 220px; font-size: 0.85rem;">
+          </div>
         </div>
 
         <div class="table-container">

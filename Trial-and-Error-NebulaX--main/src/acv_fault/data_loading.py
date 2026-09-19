@@ -157,7 +157,7 @@ def load_all_cases(
         if not path.exists():
             raise FileNotFoundError(f"Expected data file not found: {path}")
         case_id = filename
-        df_wide = pd.read_excel(path, sheet_name="Sheet1")
+        df_wide = pd.read_excel(path, sheet_name=0)
         long_df = melt_case(df_wide, case_id)
         long_df, n_filled = apply_outside_temperature_fix(long_df)
         long_df["faulty_car"] = faulty_car

@@ -37,6 +37,10 @@
         <span class="pill-label">COMPETITION SCORE</span>
         <span class="pill-value" style="color: var(--color-normal);">0.9218</span>
       </div>
+      <input type="file" id="shmFileInput" accept=".csv" style="display: none;">
+      <button id="btnUploadShm" class="btn btn-primary" title="Upload a dynamic stress CSV file to predict fatigue damage with Log Extra Trees">
+        <span class="btn-icon">📤</span> Upload Stress CSV
+      </button>
       <a href="/api/download_master_submission" class="btn btn-success" title="Download official submission package containing all 4 model CSVs">
         <span class="btn-icon">📦</span> Master ZIP
       </a>
@@ -49,7 +53,7 @@
     <!-- Sub-Tabs Switcher -->
     <div class="sub-tabs-container">
       <button class="sub-tab-btn active" data-target="pane-predictions">
-        <span>📋</span> Predictions Overview (20 Dynamic Stress Cases)
+        <span>📋</span> <span id="shmTabTitle">Predictions Overview (16 Dynamic Stress Test Cases)</span>
       </button>
       <button class="sub-tab-btn" data-target="pane-analysis">
         <span>📊</span> Model Analysis &amp; Benchmark (Log Extra Trees)
@@ -120,10 +124,11 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
           <div class="filter-group">
             <span class="filter-label">Filter Severity:</span>
-            <button class="filter-btn active" data-filter="all">All (20)</button>
-            <button class="filter-btn" data-filter="low" style="color: var(--color-normal);">Low Risk (8)</button>
-            <button class="filter-btn" data-filter="medium" style="color: var(--color-side1);">Medium Risk (8)</button>
-            <button class="filter-btn" data-filter="high" style="color: var(--color-danger);">High Risk (4)</button>
+            <button class="filter-btn active" data-filter="all">All (<span id="countAllShm">16</span>)</button>
+            <button class="filter-btn" data-filter="low" style="color: var(--color-normal);">Low Risk (<span id="countLowShm">8</span>)</button>
+            <button class="filter-btn" data-filter="medium" style="color: var(--color-side1);">Medium Risk (<span id="countMedShm">4</span>)</button>
+            <button class="filter-btn" data-filter="high" style="color: var(--color-danger);">High Risk (<span id="countHighShm">4</span>)</button>
+            <button class="filter-btn" data-filter="uploaded" id="btnFilterUploadedShm" style="display: none; color: #38bdf8;">📤 Uploaded (<span id="countUploadedShm">0</span>)</button>
           </div>
           <div style="position: relative;">
             <input type="text" id="shmSearchInput" placeholder="Search stress file..." class="styled-input" style="padding: 0.45rem 1rem; width: 220px; font-size: 0.85rem;">

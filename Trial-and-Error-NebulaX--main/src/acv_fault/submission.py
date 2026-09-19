@@ -40,7 +40,7 @@ def score_new_file(
     is just this one call.
     """
     case_id = xlsx_path.name if hasattr(xlsx_path, "name") else str(xlsx_path).rsplit("/", 1)[-1]
-    df_wide = pd.read_excel(xlsx_path, sheet_name="Sheet1")
+    df_wide = pd.read_excel(xlsx_path, sheet_name=0)
     long_df = data_loading.melt_case(df_wide, case_id)
     long_df, _n_filled = data_loading.apply_outside_temperature_fix(long_df)
 
