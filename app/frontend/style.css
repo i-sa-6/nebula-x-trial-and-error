@@ -1161,5 +1161,175 @@ body::before {
   display: inline-block;
 }
 
+/* Fleet Vulnerability Heatmap & Points of Failure */
+.vulnerability-card {
+  margin-bottom: 1.75rem;
+  border-color: rgba(239, 68, 68, 0.25);
+  background: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.06) 0%, rgba(15, 23, 42, 0.9) 75%);
+}
+
+.wheel-node.tier-critical {
+  background: var(--color-danger) !important;
+  color: #fff !important;
+  border: 1px solid #ff7b7b !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+  animation: failurePulse 2s infinite ease-in-out;
+  position: relative;
+}
+
+@keyframes failurePulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), 0 0 25px rgba(245, 158, 11, 0.5);
+    transform: scale(1.08);
+  }
+}
+
+.wheel-node.tier-high {
+  background: var(--color-side1) !important;
+  color: #000 !important;
+  border: 1px solid #fcd34d !important;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.wheel-node.tier-moderate {
+  background: rgba(234, 179, 8, 0.7) !important;
+  color: #000 !important;
+  border: 1px solid rgba(234, 179, 8, 0.5) !important;
+}
+
+.wheel-node.tier-baseline {
+  background: var(--color-normal) !important;
+  color: #000 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Points of Failure Grid */
+.failure-points-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.failure-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  position: relative;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.failure-card:hover {
+  transform: translateY(-3px);
+  background: rgba(30, 41, 59, 0.8);
+  border-color: var(--color-danger);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+}
+
+.failure-card.rank-1 {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%);
+}
+
+.failure-rank-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.badge-rank-1 { background: rgba(239, 68, 68, 0.25); color: #fca5a5; border: 1px solid #ef4444; }
+.badge-rank-2 { background: rgba(245, 158, 11, 0.25); color: #fde68a; border: 1px solid #f59e0b; }
+.badge-rank-other { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.15); }
+
+.failure-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.failure-metrics {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.failure-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+/* Engineering Significance Grid */
+.significance-container {
+  background: rgba(10, 15, 30, 0.75);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.significance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.significance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.significance-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
+  transition: border-color var(--transition-fast);
+}
+
+.significance-card:hover {
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+.significance-card h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.significance-card p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+
 
 

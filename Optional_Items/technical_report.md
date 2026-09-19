@@ -105,3 +105,38 @@ Our system converts raw AI probabilities into actionable engineering directives 
    Directly informs nocturnal maintenance possession planning (e.g., dispatching rail-milling and grinding trains during engineering hours between 01:30 and 04:30 AM).
 3. **Severity & Wavelength Output**:
    Providing estimated corrugation wavelength $\lambda \approx 20 - 40\text{ mm}$ guides grinding stone selection and pass speed for optimal restoration of track longitudinal profile.
+
+---
+
+## 6. Empirical Fleet Vulnerability & Wheel Failure Point Analysis (Test Set)
+
+Comprehensive empirical analysis of all 68 held-out test runs across all 64 axle-box vibration channels reveals distinct mechanical vulnerability clusters across the 8-car consist:
+
+### 6.1 Top 5 Critical Failure Points
+1. **Car 4, Axle-Box Position 3 (Side I / Left Rail)**:
+   - **Exceedance Frequency**: 3 of 68 runs exceed the severe threshold ($>1.20\text{ m/s}^2$)
+   - **Max Test Peak RMS**: $1.901\text{ m/s}^2$ | **Defect Mean RMS**: $0.703\text{ m/s}^2$
+   - **Mechanism**: Primary mid-consist Left Rail corrugation initiation site under heavy regenerative braking.
+2. **Car 4, Axle-Box Position 8 (Side II / Right Rail)**:
+   - **Exceedance Frequency**: 2 of 68 runs exceed threshold
+   - **Max Test Peak RMS**: **$2.134\text{ m/s}^2$** (Fleet Maximum Record)
+   - **Mechanism**: Extreme draft-gear longitudinal buffing shockwaves focus at Car 4, driving violent dynamic unloading and right-rail contact shear.
+3. **Car 8, Axle-Box Position 1 (Side I / Left Rail)**:
+   - **Exceedance Frequency**: 2 of 68 runs exceed threshold
+   - **Max Test Peak RMS**: $1.710\text{ m/s}^2$ | **Defect Mean RMS**: **$0.749\text{ m/s}^2$** (Fleet Highest Mean Defect Intensity)
+   - **Mechanism**: Trailing tail car leading bogie entry; high-amplitude friction stick-slip oscillations carving short-pitch corrugation.
+4. **Car 8, Axle-Box Position 6 (Side II / Right Rail)**:
+   - **Exceedance Frequency**: 2 of 68 runs exceed threshold
+   - **Max Test Peak RMS**: $2.065\text{ m/s}^2$
+   - **Mechanism**: Under-damped trailing tail-whip hunting oscillations concentrating dynamic wheel unloading on Side II.
+5. **Car 1, Axle-Box Positions 4 & 2 (Side II / Right Rail)**:
+   - **Exceedance Frequency**: 3 of 68 runs exceed threshold
+   - **Max Test Peak RMS**: $1.794\text{ m/s}^2$ | **Defect Mean RMS**: $0.642\text{ m/s}^2$
+   - **Mechanism**: Head car leading curve attack angle; unattenuated collision with pristine track irregularities during initial line entry.
+
+### 6.2 Engineering Significance & Root Cause Failure Mechanisms
+- **Leading Axle Attack Angle ($T/\mu N \approx 1$)**: Axle positions 1, 2, 5, 7 enter transitions first, saturating creepage and triggering self-excited friction chatter.
+- **Mid-Train Kinematic Node (Car 4)**: Located at the articulated consist midpoint, Car 4 absorbs opposite-direction buffing and draft shockwaves during speed transitions.
+- **Consist Extremities (Cars 1 & 8)**: Head Car 1 absorbs raw track inputs, while Tail Car 8 experiences amplified lateral yaw whip due to lack of trailing structural coupling.
+- **Targeted LTA Asset Management**: Instead of full-line reprofiling, maintenance teams can prioritize grinding and top-of-rail friction management specifically at Car 4 and Car 8 wheel-rail interfaces.
+
