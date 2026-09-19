@@ -376,11 +376,14 @@ function updateTrainSchematic(carWheelData) {
       node.dataset.vibRms = pData.vib_rms;
       node.dataset.shockRms = pData.shock_rms;
       
-      // Color code based on vibration threshold
-      if (pData.vib_rms > 0.70) {
+      // Color code based on calibrated railway operational thresholds:
+      // Operational baseline: < 0.65 m/s² (Normal rolling vibration)
+      // Moderate dynamic excitation: 0.65 - 1.20 m/s² (Dynamic track response)
+      // Severe corrugation resonance: > 1.20 m/s² (Abnormal corrugation wear)
+      if (pData.vib_rms > 1.20) {
         node.style.background = 'var(--color-danger)';
         node.style.color = '#fff';
-      } else if (pData.vib_rms > 0.35) {
+      } else if (pData.vib_rms > 0.65) {
         node.style.background = 'var(--color-side1)';
         node.style.color = '#000';
       } else {
