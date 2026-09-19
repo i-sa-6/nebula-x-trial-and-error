@@ -37,14 +37,24 @@ async function initApp() {
         }
       }
       if (!found) {
-        select.selectedIndex = 0;
-        analyzeFile(select.options[0].value);
+        selectDefaultTest1(select);
       }
     } else {
-      select.selectedIndex = 0;
-      analyzeFile(select.options[0].value);
+      selectDefaultTest1(select);
     }
   }
+}
+
+function selectDefaultTest1(select) {
+  let defaultIdx = 0;
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value.toLowerCase() === 'test1.csv') {
+      defaultIdx = i;
+      break;
+    }
+  }
+  select.selectedIndex = defaultIdx;
+  analyzeFile(select.options[defaultIdx].value);
 }
 
 async function loadStatus() {
