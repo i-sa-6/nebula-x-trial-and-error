@@ -184,6 +184,19 @@ function setupEventListeners() {
     });
   }
 
+  // Toggle Threshold Calibration Info
+  const btnThreshold = document.getElementById('btnToggleThresholdInfo');
+  const cardThreshold = document.getElementById('thresholdExplanationCard');
+  if (btnThreshold && cardThreshold) {
+    btnThreshold.addEventListener('click', () => {
+      const isHidden = cardThreshold.style.display === 'none';
+      cardThreshold.style.display = isHidden ? 'block' : 'none';
+      btnThreshold.innerHTML = isHidden 
+        ? '<span>🔬 Hide Calibration Details</span>' 
+        : '<span>🔬 Threshold Physics &amp; Standards</span>';
+    });
+  }
+
   // Download Zip (if present on page)
   const btnZip = document.getElementById('btnDownloadZip');
   if (btnZip) {

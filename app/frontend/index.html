@@ -56,10 +56,15 @@
           <h3>8-CAR TRAIN DIGITAL TWIN SCHEMATIC</h3>
           <p class="panel-desc">Axle-box vibration intensity across 64 wheelsets (Cars 1–8, Positions 1–8)</p>
         </div>
-        <div class="legend">
-          <span class="legend-item"><span class="dot dot-green"></span> Baseline (&lt;0.65 m/s²)</span>
-          <span class="legend-item"><span class="dot dot-amber"></span> Moderate Dynamic (0.65–1.20 m/s²)</span>
-          <span class="legend-item"><span class="dot dot-red"></span> Severe Corrugation (&gt;1.20 m/s²)</span>
+        <div class="legend-container">
+          <div class="legend">
+            <span class="legend-item"><span class="dot dot-green"></span> Baseline (&lt;0.65 m/s²)</span>
+            <span class="legend-item"><span class="dot dot-amber"></span> Moderate Dynamic (0.65–1.20 m/s²)</span>
+            <span class="legend-item"><span class="dot dot-red"></span> Severe Corrugation (&gt;1.20 m/s²)</span>
+          </div>
+          <button id="btnToggleThresholdInfo" class="threshold-info-btn" title="Learn why thresholds are calibrated at 1.20 m/s² instead of 10.5 m/s²">
+            <span>🔬 Threshold Physics &amp; Standards</span>
+          </button>
         </div>
       </div>
 
@@ -75,6 +80,37 @@
         Hover over any axle-box wheel above to inspect its live RMS vibration and shock readings.
       </div>
 
+      <!-- Engineering Threshold Calibration Rationale -->
+      <div class="threshold-explanation-card" id="thresholdExplanationCard">
+        <div class="threshold-header">
+          <div class="threshold-title">
+            <span class="icon">🔬</span>
+            <strong>OPERATIONAL CALIBRATION: WHY &gt;1.20 m/s² INSTEAD OF &gt;10.5 m/s²?</strong>
+          </div>
+          <span class="threshold-badge">ISO 10816 / UIC 518 / EN 14363 Standards</span>
+        </div>
+
+        <div class="threshold-grid">
+          <div class="threshold-col">
+            <div class="col-badge baseline-badge">🟢 Baseline (&lt;0.65 m/s² | &lt;0.066 g)</div>
+            <p><strong>Smooth Continuous Welded Rail (CWR):</strong> Normal rolling noise on healthy Singapore MRT track. Primary suspension isolates vibration effortlessly. Zero structural fatigue.</p>
+          </div>
+          <div class="threshold-col">
+            <div class="col-badge moderate-badge">🟡 Moderate (0.65–1.20 m/s² | 0.07–0.12 g)</div>
+            <p><strong>Dynamic Track Response:</strong> Mild acoustic roughness, sleeper passing transitions, or curve hunting. Passenger ride index remains compliant; no immediate track repair required.</p>
+          </div>
+          <div class="threshold-col">
+            <div class="col-badge severe-badge">🔴 Severe Corrugation (&gt;1.20 m/s² | &gt;0.12 g)</div>
+            <p><strong>Abnormal Periodic Resonance:</strong> Sustained vibration triples baseline energy. Fastening clips fatigue, ballast pulverizes, and in-cabin noise exceeds 75 dBA. Triggers Level 2 rail grinding possession.</p>
+          </div>
+        </div>
+
+        <div class="threshold-critical-callout">
+          <strong>⚠️ Why not &gt;10.5 m/s²?</strong>
+          Standard gravity is <em>g = 9.81 m/s²</em>. Sustained vibration of <strong>10.5 m/s² (1.07 g)</strong> causes <strong>Wheel Unloading (Q &le; 0)</strong> under UIC 518 where wheels literally lift off the rail head, causing acute derailment! Real-world corrugation wear (0.05–0.25 mm micro-ripples) produces <strong>1.3 – 2.8 m/s² continuous RMS</strong>. If calibrated at &gt;10.5 m/s², every damaged rail would falsely appear green until catastrophic failure.
+        </div>
+      </div>
+
       <!-- ELI5 Simple Explanation -->
       <div class="eli5-box">
         <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
@@ -84,6 +120,8 @@
           🟡 <strong>Yellow wheels</strong> feel small bumps on the track. 
           🔴 <strong>Red wheels</strong> are hitting rough, wavy metal ripples (called <em>corrugation</em>) that shake the train! 
           Top row wheels ride on the <strong>Left Rail (Side I)</strong>, and bottom row wheels ride on the <strong>Right Rail (Side II)</strong>. If only one row turns red, we know exactly which rail is bumpy!
+          <br><br>
+          🤔 <strong>Why does the red warning turn on at 1.2 and not 10?</strong> Because 10 is as strong as Earth's gravity! If the train shook at 10, the wheels would literally float in the air and crash! The wavy ripples on the rails are tiny (thinner than a fingernail), so catching them early at 1.2 lets engineers grind them smooth weeks before they ever become dangerous.
           <br><br>
           📤 <strong>Testing your own train file?</strong> Click the blue <strong>Upload Test CSV</strong> button in the top bar! The system will check all 129 physical parameters first; if everything checks out, it joins the test pool and lights up on the train schematic instantly!
         </div>
