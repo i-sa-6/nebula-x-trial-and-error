@@ -1,14 +1,18 @@
 # Google Cloud Build Pipeline for NebulaX Rail Corrugation Condition Monitoring
 steps:
-  # 1. Build the container image from Dockerfile
+  # 1. Clone repository branch from GitHub directly (no local file upload needed)
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', '--depth', '1', '-b', 'Rail-Corrugation', 'https://github.com/i-sa-6/nebula-x-trial-and-error.git', '.']
+
+  # 2. Build the container image from Dockerfile
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/nebula-rail-twin:latest', '.']
   
-  # 2. Push image to Google Container Registry
+  # 3. Push image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/nebula-rail-twin:latest']
   
-  # 3. Deploy to Google Cloud Run (Asia Southeast 1 - Singapore)
+  # 4. Deploy to Google Cloud Run (Asia Southeast 1 - Singapore)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
