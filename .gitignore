@@ -20,3 +20,5 @@ venv/
 
 # Generated predictions
 shm_predictions.csv
+
+shm_validation_results.csv
