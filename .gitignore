@@ -20,5 +20,8 @@ venv/
 
 # Generated predictions
 shm_predictions.csv
-
 shm_validation_results.csv
+
+# Large hackathon raw sensor datasets
+data/
+scratch/

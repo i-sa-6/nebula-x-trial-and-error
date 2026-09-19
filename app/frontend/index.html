@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEBULA-X | LTA Automated Train Condition Monitoring Executive Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">🚆</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem" style="background: rgba(0, 240, 255, 0.15); border-color: rgba(0, 240, 255, 0.4); color: #00f0ff;">Fleet Executive Portal</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — Automated Train Condition Monitoring System</p>
+      </div>
+    </div>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight">
+        <span class="pill-label">SUBSYSTEMS</span>
+        <span class="pill-value">4 ACTIVE</span>
+      </div>
+      <div class="metric-pill">
+        <span class="pill-label">CLOUD RUN</span>
+        <span class="pill-value" style="color: var(--color-normal);">● LIVE</span>
+      </div>
+      <a href="/api/download_master_submission" class="btn btn-success" id="btnDownloadMaster" title="Download official submission package containing all 4 model CSVs">
+        <span class="btn-icon">📦</span> Download Master Submission (.ZIP)
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Portal Container -->
+  <main class="dashboard-container" style="max-width: 1440px; margin: 0 auto; padding: 2rem;">
+
+    <!-- Executive Greeting Banner -->
+    <section class="glass-panel" style="padding: 2rem 2.5rem; position: relative; overflow: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 2;">
+        <div style="max-width: 780px;">
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); font-size: 0.75rem; color: var(--primary); font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <span>⚡</span> Automated Fleet Condition Monitoring Platform
+          </div>
+          <h2 style="font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 0.6rem;">
+            Select a Train Subsystem Model
+          </h2>
+          <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6;">
+            Select one of the 4 specialized machine learning models below to inspect predictions, deep-dive into model accuracy &amp; architecture, and interact with live diagnostic digital twin test scenarios.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="glass-panel" style="padding: 1rem 1.5rem; background: rgba(0, 0, 0, 0.4); text-align: center; border-radius: var(--radius-md);">
+            <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Fleet Availability</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--color-normal); font-family: var(--font-mono);">94.8%</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Nominal Operations</div>
+          </div>
+          <div class="glass-panel" style="padding: 1rem 1.5rem; background: rgba(0, 0, 0, 0.4); text-align: center; border-radius: var(--radius-md);">
+            <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Monitored Consists</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary); font-family: var(--font-mono);">8 Cars</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">64 Bilateral Wheelsets</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The 4 Core Subsystem Options Grid -->
+    <section class="subsystem-grid">
+
+      <!-- Card 1: Rail Corrugation -->
+      <div class="subsystem-card" style="--card-accent: #00f0ff; --card-accent-glow: rgba(0, 240, 255, 0.3);">
+        <div>
+          <div class="subsystem-card-header">
+            <div class="subsystem-icon-box" style="color: #00f0ff; border-color: rgba(0, 240, 255, 0.3);">
+              🚆
+            </div>
+            <div>
+              <span class="subsystem-badge-tag" style="color: #00f0ff; border-color: rgba(0, 240, 255, 0.3);">PS3 Subsystem 3</span>
+              <h3 class="subsystem-title">Rail Corrugation Subsystem</h3>
+            </div>
+          </div>
+
+          <p class="subsystem-desc">
+            Multi-class track surface corrugation detection and bilateral wheelset fault localization across 64 wheels of an 8-car passenger consist.
+          </p>
+
+          <div class="subsystem-kpi-bar">
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Champion Metric</span>
+              <span class="subsystem-kpi-value" style="color: #00f0ff;">Macro F1: 0.8507</span>
+            </div>
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Algorithm</span>
+              <span class="subsystem-kpi-value" style="font-size: 0.95rem;">Ensemble (HGB + LR)</span>
+            </div>
+            <div class="subsystem-kpi-item" style="grid-column: span 2; margin-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;">
+              <span class="subsystem-kpi-label">Status</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">68 Recordings Triaged • 60 Normal, 8 Corrugated</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsystem-actions">
+          <a href="corrugation.html" class="subsystem-primary-btn" id="btnLaunchCorrugation">
+            <span>Launch Rail Corrugation Hub</span>
+            <span>→</span>
+          </a>
+          <div class="subsystem-sublinks">
+            <a href="corrugation.html" class="subsystem-sublink">📋 Predictions</a>
+            <a href="accuracy.html" class="subsystem-sublink">📊 Model Analysis</a>
+            <a href="twin.html" class="subsystem-sublink">🔬 Live Diagnostic Twin</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Structural Health Monitoring (SHM) -->
+      <div class="subsystem-card" style="--card-accent: #f59e0b; --card-accent-glow: rgba(245, 158, 11, 0.3);">
+        <div>
+          <div class="subsystem-card-header">
+            <div class="subsystem-icon-box" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
+              🏗️
+            </div>
+            <div>
+              <span class="subsystem-badge-tag" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">PS3 Subsystem 4</span>
+              <h3 class="subsystem-title">Structural Health Monitoring (SHM)</h3>
+            </div>
+          </div>
+
+          <p class="subsystem-desc">
+            Bogie dynamic stress fatigue damage prediction, Palmgren-Miner cumulative fatigue cycle estimation, and Remaining Useful Life (RUL) forecasting.
+          </p>
+
+          <div class="subsystem-kpi-bar">
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Validation MAPE</span>
+              <span class="subsystem-kpi-value" style="color: #f59e0b;">7.82% (Score: 0.9218)</span>
+            </div>
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Algorithm</span>
+              <span class="subsystem-kpi-value" style="font-size: 0.95rem;">Log Extra Trees</span>
+            </div>
+            <div class="subsystem-kpi-item" style="grid-column: span 2; margin-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;">
+              <span class="subsystem-kpi-label">Status</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">20 Test Dynamic Stress Files • 8 Low, 8 Med, 4 High Risk</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsystem-actions">
+          <a href="shm.html" class="subsystem-primary-btn" style="background: linear-gradient(135deg, #d97706, #b45309);" id="btnLaunchSHM">
+            <span>Launch SHM Fatigue Hub</span>
+            <span>→</span>
+          </a>
+          <div class="subsystem-sublinks">
+            <a href="shm.html#predictions" class="subsystem-sublink">📋 Predictions</a>
+            <a href="shm.html#analysis" class="subsystem-sublink">📊 Model Analysis</a>
+            <a href="shm.html#twin" class="subsystem-sublink">🔬 Fatigue Digital Twin</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: ACV Refrigerant-Leak Fault Localization -->
+      <div class="subsystem-card" style="--card-accent: #38bdf8; --card-accent-glow: rgba(56, 189, 248, 0.3);">
+        <div>
+          <div class="subsystem-card-header">
+            <div class="subsystem-icon-box" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+              ❄️
+            </div>
+            <div>
+              <span class="subsystem-badge-tag" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">PS3 Subsystem 2</span>
+              <h3 class="subsystem-title">ACV Refrigerant-Leak Localization</h3>
+            </div>
+          </div>
+
+          <p class="subsystem-desc">
+            Unsupervised anomaly detection and faulty car ranking across 8-car train HVAC systems using multi-day 30-second thermodynamic telemetry.
+          </p>
+
+          <div class="subsystem-kpi-bar">
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Accuracy / MRR</span>
+              <span class="subsystem-kpi-value" style="color: #38bdf8;">92.5% / 0.850 MRR</span>
+            </div>
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Algorithm</span>
+              <span class="subsystem-kpi-value" style="font-size: 0.95rem;">Robust Elliptic Envelope</span>
+            </div>
+            <div class="subsystem-kpi-item" style="grid-column: span 2; margin-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;">
+              <span class="subsystem-kpi-label">Status</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">6 Evaluation Cases Triaged • Consist Ranked (01|02|08...)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsystem-actions">
+          <a href="acv.html" class="subsystem-primary-btn" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btnLaunchACV">
+            <span>Launch ACV Refrigerant Hub</span>
+            <span>→</span>
+          </a>
+          <div class="subsystem-sublinks">
+            <a href="acv.html#predictions" class="subsystem-sublink">📋 Predictions</a>
+            <a href="acv.html#analysis" class="subsystem-sublink">📊 Model Analysis</a>
+            <a href="acv.html#twin" class="subsystem-sublink">🔬 Consist Cooling Twin</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Train Doors Subsystem -->
+      <div class="subsystem-card" style="--card-accent: #10b981; --card-accent-glow: rgba(16, 185, 129, 0.3);">
+        <div>
+          <div class="subsystem-card-header">
+            <div class="subsystem-icon-box" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+              🚪
+            </div>
+            <div>
+              <span class="subsystem-badge-tag" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3);">PS3 Subsystem 1</span>
+              <h3 class="subsystem-title">Train Doors Condition Monitoring</h3>
+            </div>
+          </div>
+
+          <p class="subsystem-desc">
+            High-frequency 50Hz temporal cycle segmentation and abnormal mechanical resistance classification from DC motor current waveforms.
+          </p>
+
+          <div class="subsystem-kpi-bar">
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Macro F1 Score</span>
+              <span class="subsystem-kpi-value" style="color: #10b981;">1.000 (100%)</span>
+            </div>
+            <div class="subsystem-kpi-item">
+              <span class="subsystem-kpi-label">Algorithm</span>
+              <span class="subsystem-kpi-value" style="font-size: 0.95rem;">Random Forest / LogReg</span>
+            </div>
+            <div class="subsystem-kpi-item" style="grid-column: span 2; margin-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.35rem;">
+              <span class="subsystem-kpi-label">Status</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">38 Cycles Segmented • 30 Normal, 8 Abnormal Resistance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsystem-actions">
+          <a href="doors.html" class="subsystem-primary-btn" style="background: linear-gradient(135deg, #059669, #047857);" id="btnLaunchDoors">
+            <span>Launch Doors Monitor Hub</span>
+            <span>→</span>
+          </a>
+          <div class="subsystem-sublinks">
+            <a href="doors.html#predictions" class="subsystem-sublink">📋 Predictions</a>
+            <a href="doors.html#analysis" class="subsystem-sublink">📊 Model Analysis</a>
+            <a href="doors.html#twin" class="subsystem-sublink">🔬 Door Motion Simulator</a>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Master Submission Package Inspector -->
+    <section class="glass-panel" style="margin-top: 2rem; padding: 1.5rem 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <span>📦</span> Official LTA Multi-Subsystem Submission Artifacts
+          </h3>
+          <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Unified ZIP package bundles all 4 verified predictions CSV files compliant with LTA benchmark formatting.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <span class="stream-meta-badge" style="font-size: 0.725rem; border-color: rgba(16, 185, 129, 0.4); color: var(--color-normal);">
+            ✓ rail_predictions.csv (68 rows)
+          </span>
+          <span class="stream-meta-badge" style="font-size: 0.725rem; border-color: rgba(245, 158, 11, 0.4); color: var(--color-side1);">
+            ✓ shm_predictions.csv (20 rows)
+          </span>
+          <span class="stream-meta-badge" style="font-size: 0.725rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+            ✓ acv_predictions.csv (6 rows)
+          </span>
+          <span class="stream-meta-badge" style="font-size: 0.725rem; border-color: rgba(16, 185, 129, 0.4); color: var(--color-normal);">
+            ✓ door_predictions.csv (38 rows)
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="margin-top: 3rem; text-align: center; color: var(--text-dim); font-size: 0.8rem; padding-bottom: 2rem;">
+      <p>NEBULA-X Automated Train Condition Monitoring System • Powered by Google Cloud Run</p>
+      <p style="margin-top: 0.25rem;">Singapore Land Transport Authority (LTA) &bull; Rail Corrugation, SHM, ACV Leak &amp; Doors Intelligence</p>
+    </footer>
+
+  </main>
+</body>
+</html>

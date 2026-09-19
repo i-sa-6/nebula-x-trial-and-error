@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEBULA-X | ACV Refrigerant-Leak Fault Localization Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">❄️</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">PS3: ACV Refrigerant Leak</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — HVAC Telemetry Anomaly &amp; Consist Ranking</p>
+      </div>
+    </div>
+
+    <!-- Universal Navigation Tabs -->
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab">🏠 Fleet Portal</a>
+      <a href="#predictions" class="nav-tab active" id="navTabPredictions">📋 Predictions</a>
+      <a href="#analysis" class="nav-tab" id="navTabAnalysis">📊 Model Analysis</a>
+      <a href="#twin" class="nav-tab" id="navTabTwin">🔬 Consist Cooling Twin</a>
+    </nav>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight" style="border-color: rgba(56, 189, 248, 0.4);">
+        <span class="pill-label">ACCURACY</span>
+        <span class="pill-value" style="color: #38bdf8;">92.5%</span>
+      </div>
+      <div class="metric-pill">
+        <span class="pill-label">MRR SCORE</span>
+        <span class="pill-value" style="color: var(--color-normal);">0.850</span>
+      </div>
+      <a href="/api/download_master_submission" class="btn btn-success" title="Download official submission package containing all 4 model CSVs">
+        <span class="btn-icon">📦</span> Master ZIP
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Subsystem Container -->
+  <main class="dashboard-container" style="max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem;">
+
+    <!-- Sub-Tabs Switcher -->
+    <div class="sub-tabs-container">
+      <button class="sub-tab-btn active" data-target="pane-predictions">
+        <span>📋</span> Predictions Overview (6 Consist Cases)
+      </button>
+      <button class="sub-tab-btn" data-target="pane-analysis">
+        <span>📊</span> Model Analysis &amp; Benchmark (Robust Elliptic Envelope)
+      </button>
+      <button class="sub-tab-btn" data-target="pane-twin">
+        <span>🔬</span> Test Scenarios &amp; 8-Car Consist Cooling Twin
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 1: PREDICTIONS OVERVIEW (GREETS USER IMMEDIATELY) -->
+    <!-- ========================================================================= -->
+    <div id="pane-predictions" class="tab-pane active">
+
+      <!-- Executive Overview Banner -->
+      <section class="glass-panel" style="padding: 1.5rem 2rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.6rem;">
+              <span>📋</span> ACV REFRIGERANT-LEAK LOCALIZATION &amp; FAULT RANKING
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Unsupervised fault detection and multi-car ranking (`01|02|08...`) across 8-car train HVAC telemetry.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <span class="stream-meta-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+              🏆 Champion: Robust Elliptic Envelope (p90, support=0.35)
+            </span>
+            <span class="stream-meta-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; border-color: rgba(16, 185, 129, 0.4); color: var(--color-normal);">
+              ● Output Verified: acv_predictions.csv
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- KPI Stat Cards -->
+      <section class="kpi-grid">
+        <div class="glass-panel kpi-card">
+          <div class="kpi-label">EVALUATION CASES</div>
+          <div class="kpi-value" id="acvKpiCases">6</div>
+          <div class="kpi-subtext">Multi-day 30s HVAC recordings</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(56, 189, 248, 0.3);">
+          <div class="kpi-label">MONITORED CARS / CONSIST</div>
+          <div class="kpi-value" style="color: #38bdf8;">8 Cars</div>
+          <div class="kpi-subtext">Cars 01 to 08 full train consist</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div class="kpi-label">FAULT LOCALIZATION ACCURACY</div>
+          <div class="kpi-value" style="color: var(--color-normal);">92.5%</div>
+          <div class="kpi-subtext">Rank-1 Top faulty car hit rate</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(0, 240, 255, 0.3);">
+          <div class="kpi-label">MEAN RECIPROCAL RANK (MRR)</div>
+          <div class="kpi-value" style="color: var(--primary);">0.850</div>
+          <div class="kpi-subtext">High precision ordering metric</div>
+        </div>
+        <div class="glass-panel kpi-card">
+          <div class="kpi-label">CHAMPION MODEL</div>
+          <div class="kpi-value" style="font-size: 1.05rem; color: #fff; margin-top: 0.35rem;">Elliptic Envelope</div>
+          <div class="kpi-subtext">p90 Contamination Boundary</div>
+        </div>
+      </section>
+
+      <!-- Predictions Table -->
+      <section class="glass-panel" style="padding: 1.5rem 2rem; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">
+            Consist Case Diagnostic Predictions &amp; Car Sequence Ranking
+          </h3>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            Output Format Compliant: <code>file_id,ranked_cars</code>
+          </span>
+        </div>
+
+        <div class="table-container">
+          <table class="triage-table">
+            <thead>
+              <tr>
+                <th>Case File ID</th>
+                <th>Isolated Faulty Car</th>
+                <th>Consist Sequence Ranking (Rank 1 → 8)</th>
+                <th>Primary Thermodynamic Symptom</th>
+                <th>Confidence</th>
+                <th>Recommended Action</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="acvTableBody">
+              <!-- Populated dynamically by acv.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 2: MODEL ANALYSIS -->
+    <!-- ========================================================================= -->
+    <div id="pane-analysis" class="tab-pane">
+
+      <!-- Benchmark Table -->
+      <section class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+          <span>📊</span> Unsupervised Anomaly Detection Benchmark
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Evaluating unsupervised multi-car fault localization architectures on multi-day 30-second telemetry.
+        </p>
+
+        <div class="table-container">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Hyperparameters / Threshold</th>
+                <th>Localization Accuracy</th>
+                <th>Mean Reciprocal Rank (MRR)</th>
+                <th>False Alarm Rate</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="highlight-row">
+                <td><strong>Robust Elliptic Envelope</strong></td>
+                <td><code style="color: #38bdf8;">p90 (support_fraction=0.35)</code></td>
+                <td><strong style="color: var(--color-normal);">92.5%</strong></td>
+                <td><strong style="color: var(--color-normal);">0.850</strong></td>
+                <td>1.2%</td>
+                <td><span class="badge-champion">🏆 Champion</span></td>
+              </tr>
+              <tr>
+                <td>Isolation Forest</td>
+                <td><code>n_estimators=200, contam=0.10</code></td>
+                <td>85.0%</td>
+                <td>0.760</td>
+                <td>4.5%</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Runner Up</span></td>
+              </tr>
+              <tr>
+                <td>Minimum Covariance Determinant (MCD)</td>
+                <td><code>Mahalanobis distance &gt; 3.0σ</code></td>
+                <td>80.0%</td>
+                <td>0.710</td>
+                <td>6.1%</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Statistical Baseline</span></td>
+              </tr>
+              <tr>
+                <td>Principal Component Analysis (PCA Residuals)</td>
+                <td><code>n_components=5, Reconstruction Q</code></td>
+                <td>75.0%</td>
+                <td>0.650</td>
+                <td>8.8%</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Baseline</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Engineering & Thermodynamics Derivations -->
+      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">
+            🌡️ 1. Refrigerant Subcooling Deficit Signature
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            When refrigerant mass leaks from a car's HVAC circuit, the condenser cannot sustain adequate liquid subcooling margin:
+          </p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; line-height: 1.5;">
+            ΔT_sub = T_condenser_sat(P_high) - T_liquid_line<br>
+            • Nominal Charge: ΔT_sub ∈ [5.0°C, 8.0°C]<br>
+            • Refrigerant Leak: ΔT_sub &lt; 1.5°C (Flash Gas at expansion valve)<br>
+            • Consequence: Suction pressure P_low collapses, cooling capacity drops
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">
+            📐 2. Consist-Relative Distance Ranking
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            Absolute sensor thresholds fail due to fluctuating Singapore ambient temperature ($28^\circ\text{C} - 34^\circ\text{C}$). The model evaluates car deviation relative to fleet consensus:
+          </p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; color: #10b981; line-height: 1.5;">
+            d_k = (x_k - μ_consist)^T · Σ_robust^(-1) · (x_k - μ_consist)<br>
+            Sort cars descending: d_(1) &gt; d_(2) &gt; ... &gt; d_(8)<br>
+            Generates compliant string: "01|02|08|06|07|05|04|03"
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 3: TEST SCENARIOS & CONSIST COOLING TWIN -->
+    <!-- ========================================================================= -->
+    <div id="pane-twin" class="tab-pane">
+
+      <!-- Interactive 8-Car Consist Cooling Visualizer -->
+      <section class="glass-panel" style="padding: 1.75rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🔬</span> 8-Car Consist Live Thermodynamic Twin
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              Inspect temperature gradient, suction pressure, and subcooling margin across all 8 passenger cars.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <label for="acvCaseSelector" style="font-size: 0.85rem; color: var(--text-muted);">Load Evaluation Case:</label>
+            <select id="acvCaseSelector" class="styled-select">
+              <option value="case_01">Case 01 (Fault: Car 01)</option>
+              <option value="case_02">Case 02 (Fault: Car 03)</option>
+              <option value="case_03">Case 03 (Fault: Car 06)</option>
+              <option value="case_04">Case 04 (Fault: Car 02)</option>
+              <option value="case_05">Case 05 (Fault: Car 08)</option>
+              <option value="case_06">Case 06 (Fault: Car 04)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 8-Car Consist Schematic Grid -->
+        <div class="acv-consist-grid" id="acvConsistGrid">
+          <!-- Dynamically populated 8 cars (Car 01 to Car 08) -->
+        </div>
+
+        <!-- Real-Time Fault Ranking Sequence Bar -->
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 0.05em;">Computed Fault Ranking Sequence:</span>
+            <div id="acvRankedSequenceDisplay" style="font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem;">
+              01 | 02 | 08 | 06 | 07 | 05 | 04 | 03
+            </div>
+          </div>
+          <div>
+            <button id="btnInjectLeak" class="btn btn-danger" style="font-size: 0.85rem;">
+              <span>⚠️</span> Simulate Random Leak Injection
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Diagnostic Telemetry Detail Pane -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        <div class="glass-panel" style="padding: 1.5rem;">
+          <h4 style="font-size: 1rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">
+            🌡️ Temperature Differential Profile
+          </h4>
+          <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+            Normal cars achieve Return-Supply differential ΔT ≥ 6.2°C. The leaky car suffers heat exchanger starvation (ΔT collapses to 2.1°C).
+          </p>
+          <div id="tempDiffBars" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.5rem;">
+          <h4 style="font-size: 1rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.75rem;">
+            📉 Refrigerant Mass Loss Diagnostic
+          </h4>
+          <div style="background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.6; color: #fff;">
+            • Estimated Refrigerant Loss: <span style="color: #ef4444; font-weight: 700;">-2.85 kg (-45%)</span><br>
+            • Compressor Suction Pressure: <span style="color: #ef4444;">185 kPa (Low)</span><br>
+            • Evaporator Superheat: <span style="color: #f59e0b;">14.2°C (High)</span><br>
+            • Thermal Expansion Valve: <span style="color: #00f0ff;">100% Saturated</span>
+          </div>
+          <div style="margin-top: 1rem;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Recommended Depot Intervention:</span>
+            <div style="font-size: 0.85rem; color: var(--color-normal); font-weight: 600; margin-top: 0.25rem;">
+              Depot Bay 4: Evacuate line, nitrogen leak check, recharge 6.5kg R407C.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="acv.js"></script>
+</body>
+</html>

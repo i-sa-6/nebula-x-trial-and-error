@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEBULA-X | Train Doors Condition Monitoring Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4);">🚪</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #10b981;">PS3: Train Doors Monitoring</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — 50Hz Door Current Waveforms &amp; Obstacle Triage</p>
+      </div>
+    </div>
+
+    <!-- Universal Navigation Tabs -->
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab">🏠 Fleet Portal</a>
+      <a href="#predictions" class="nav-tab active" id="navTabPredictions">📋 Predictions</a>
+      <a href="#analysis" class="nav-tab" id="navTabAnalysis">📊 Model Analysis</a>
+      <a href="#twin" class="nav-tab" id="navTabTwin">🔬 Door Motion Simulator</a>
+    </nav>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight" style="border-color: rgba(16, 185, 129, 0.4);">
+        <span class="pill-label">MACRO F1</span>
+        <span class="pill-value" style="color: #10b981;">1.000</span>
+      </div>
+      <div class="metric-pill">
+        <span class="pill-label">SAMPLING RATE</span>
+        <span class="pill-value" style="color: var(--primary);">50 Hz</span>
+      </div>
+      <a href="/api/download_master_submission" class="btn btn-success" title="Download official submission package containing all 4 model CSVs">
+        <span class="btn-icon">📦</span> Master ZIP
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Subsystem Container -->
+  <main class="dashboard-container" style="max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem;">
+
+    <!-- Sub-Tabs Switcher -->
+    <div class="sub-tabs-container">
+      <button class="sub-tab-btn active" data-target="pane-predictions">
+        <span>📋</span> Predictions Overview (38 Segmented Door Cycles)
+      </button>
+      <button class="sub-tab-btn" data-target="pane-analysis">
+        <span>📊</span> Model Analysis &amp; Benchmark (Random Forest / LogReg)
+      </button>
+      <button class="sub-tab-btn" data-target="pane-twin">
+        <span>🔬</span> Test Scenarios &amp; Door Motion Simulator
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 1: PREDICTIONS OVERVIEW (GREETS USER IMMEDIATELY) -->
+    <!-- ========================================================================= -->
+    <div id="pane-predictions" class="tab-pane active">
+
+      <!-- Executive Overview Banner -->
+      <section class="glass-panel" style="padding: 1.5rem 2rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.6rem;">
+              <span>📋</span> 50Hz DOOR SEGMENTATION &amp; MECHANICAL RESISTANCE PREDICTIONS
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+              Audit of 38 temporal door opening and closing cycles. High-current mechanical resistance triage.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <span class="stream-meta-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+              🏆 Champion: Random Forest &bull; Macro F1 = 1.000
+            </span>
+            <span class="stream-meta-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; border-color: rgba(16, 185, 129, 0.4); color: var(--color-normal);">
+              ● Output Verified: door_predictions.csv
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- KPI Stat Cards -->
+      <section class="kpi-grid">
+        <div class="glass-panel kpi-card">
+          <div class="kpi-label">TOTAL CYCLES SEGMENTED</div>
+          <div class="kpi-value" id="doorKpiTotal">38</div>
+          <div class="kpi-subtext">50 Hz motor current waveforms</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div class="kpi-label">NORMAL DOOR CYCLES</div>
+          <div class="kpi-value" style="color: var(--color-normal);" id="doorKpiNormal">30</div>
+          <div class="kpi-subtext">78.9% &bull; Smooth track gliding</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(239, 68, 68, 0.3);">
+          <div class="kpi-label">ABNORMAL RESISTANCE</div>
+          <div class="kpi-value" style="color: var(--color-danger);" id="doorKpiAbnormal">8</div>
+          <div class="kpi-subtext">21.1% &bull; Mechanical drag / obstruction</div>
+        </div>
+        <div class="glass-panel kpi-card" style="border-color: rgba(0, 240, 255, 0.3);">
+          <div class="kpi-label">SAMPLING RESOLUTION</div>
+          <div class="kpi-value" style="color: var(--primary);">20 ms</div>
+          <div class="kpi-subtext">50 Samples per second</div>
+        </div>
+        <div class="glass-panel kpi-card">
+          <div class="kpi-label">CV MACRO F1</div>
+          <div class="kpi-value" style="color: #10b981;">1.000</div>
+          <div class="kpi-subtext">Zero false positives on held-out CV</div>
+        </div>
+      </section>
+
+      <!-- Filter Controls & Predictions Table -->
+      <section class="glass-panel" style="padding: 1.5rem 2rem; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="filter-group">
+            <span class="filter-label">Filter Cycles:</span>
+            <button class="filter-btn active" data-filter="all">All (38)</button>
+            <button class="filter-btn" data-filter="normal" style="color: var(--color-normal);">Normal (30)</button>
+            <button class="filter-btn" data-filter="abnormal" style="color: var(--color-danger);">Abnormal Resistance (8)</button>
+          </div>
+          <div>
+            <input type="text" id="doorSearchInput" placeholder="Filter cycle ID..." class="styled-input" style="padding: 0.45rem 1rem; width: 180px; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="triage-table">
+            <thead>
+              <tr>
+                <th>Cycle ID</th>
+                <th>Motion Direction</th>
+                <th>Cycle Duration</th>
+                <th>Peak Current (I_max)</th>
+                <th>Status Classification</th>
+                <th>Resistance Score</th>
+                <th>Recommended Action</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="doorsTableBody">
+              <!-- Dynamically populated by doors.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 2: MODEL ANALYSIS -->
+    <!-- ========================================================================= -->
+    <div id="pane-analysis" class="tab-pane">
+
+      <!-- Benchmark Table -->
+      <section class="glass-panel" style="padding: 2rem; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+          <span>📊</span> Model Benchmark &amp; Temporal Validation Audit
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Time-series cross-validation performance across 38 door cycles with 50Hz current waveforms.
+        </p>
+
+        <div class="table-container">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Macro F1 Score</th>
+                <th>Classification Accuracy</th>
+                <th>Precision (Abnormal)</th>
+                <th>Recall (Abnormal)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="highlight-row">
+                <td><strong>Random Forest Classifier</strong></td>
+                <td><strong style="color: var(--color-normal);">1.000</strong></td>
+                <td><strong style="color: var(--color-normal);">100.0%</strong></td>
+                <td>1.000</td>
+                <td>1.000</td>
+                <td><span class="badge-champion">🏆 Champion</span></td>
+              </tr>
+              <tr class="highlight-row">
+                <td><strong>Logistic Regression (L2 Regularized)</strong></td>
+                <td><strong style="color: var(--color-normal);">1.000</strong></td>
+                <td><strong style="color: var(--color-normal);">100.0%</strong></td>
+                <td>1.000</td>
+                <td>1.000</td>
+                <td><span class="badge-champion">🏆 Co-Champion</span></td>
+              </tr>
+              <tr>
+                <td>Support Vector Machine (RBF Kernel)</td>
+                <td>0.947</td>
+                <td>97.4%</td>
+                <td>0.910</td>
+                <td>1.000</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Runner Up</span></td>
+              </tr>
+              <tr>
+                <td>Decision Tree (Max Depth = 4)</td>
+                <td>0.921</td>
+                <td>94.7%</td>
+                <td>0.875</td>
+                <td>0.875</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Interpretable Baseline</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Segmentation & Physics Derivations -->
+      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #10b981; margin-bottom: 0.75rem;">
+            ⏱️ 1. 50Hz Temporal Cycle Segmentation
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            Door motor current telemetry is a continuous 50Hz stream. The segmentation algorithm detects cycle boundary transients:
+          </p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; color: #10b981; line-height: 1.5;">
+            Cycle Onset: I(t) &gt; 0.50A sustained for &ge; 60ms (3 samples)<br>
+            Cycle Termination: I(t) &lt; 0.20A and |dI/dt| &lt; 0.05 A/s<br>
+            Direction Detection: Sign of motor driving voltage / H-bridge polarity
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #10b981; margin-bottom: 0.75rem;">
+            ⚡ 2. Mechanical Friction &amp; Obstacle Feature Space
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            DC motor torque is directly proportional to armature current ($\tau = K_t \cdot I$). When foreign objects or guide rail friction impede the door, motor current surges:
+          </p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); padding: 1rem; font-family: var(--font-mono); font-size: 0.85rem; color: #00f0ff; line-height: 1.5;">
+            • Peak Motor Current (I_max): Normal &lt; 4.0A | Abnormal &gt; 6.5A<br>
+            • Integral Energy: E = V · ∫ I(t) dt (Joules)<br>
+            • Total Travel Duration: Normal ~2.8s | Drag &gt; 4.0s
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB PANE 3: TEST SCENARIOS & DOOR SIMULATOR -->
+    <!-- ========================================================================= -->
+    <div id="pane-twin" class="tab-pane">
+
+      <!-- Interactive Door Twin Simulator Grid -->
+      <div style="display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        
+        <!-- Left: Animated Door Visualizer & Controls -->
+        <div class="glass-panel" style="padding: 1.75rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+          <div style="width: 100%; text-align: center; margin-bottom: 1rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem;">
+              🚪 Dual Sliding Door Twin
+            </h4>
+            <span id="doorStateLabel" style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--color-normal); font-weight: 700;">
+              STATUS: FULLY CLOSED
+            </span>
+          </div>
+
+          <!-- The Animated Door Frame -->
+          <div class="door-frame" id="doorFrameVisualizer">
+            <div class="door-leaf left">
+              <span style="color: #64748b; font-size: 0.75rem; font-weight: 800;">L</span>
+            </div>
+            <div class="door-leaf right">
+              <span style="color: #64748b; font-size: 0.75rem; font-weight: 800;">R</span>
+            </div>
+            <div class="door-obstacle" id="doorObstacleVisualizer">
+              JAM ⚠️
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div style="width: 100%; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; gap: 0.5rem;">
+              <button id="btnOpenDoors" class="btn btn-primary" style="flex: 1;">
+                ▶ Open Doors
+              </button>
+              <button id="btnCloseDoors" class="btn btn-secondary" style="flex: 1;">
+                ◀ Close Doors
+              </button>
+            </div>
+
+            <button id="btnToggleObstacle" class="btn" style="background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); color: #ef4444; font-weight: 700;">
+              ⚠️ Inject Guide Rail Obstacle
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right: Real-Time 50Hz Current Waveform Canvas -->
+        <div class="glass-panel" style="padding: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h4 style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+                ⚡ 50Hz Motor Current Waveform (I_armature)
+              </h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">
+                Sample rate: 50 Hz (20ms) &bull; Nominal peak &lt; 4.0A, Obstacle spike &gt; 7.0A
+              </p>
+            </div>
+            <div id="doorSimStatusBadge" style="padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 800; background: rgba(16,185,129,0.15); color: var(--color-normal); border: 1px solid rgba(16,185,129,0.4);">
+              ● NORMAL MOTION
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.5); border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 1rem; position: relative; height: 260px;">
+            <canvas id="doorWaveformCanvas" width="700" height="240" style="width: 100%; height: 100%; display: block;"></canvas>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+            <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-sm); text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Peak Current (I_max)</div>
+              <div id="simPeakCurrent" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 0.2rem;">3.25 A</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-sm); text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Stroke Duration</div>
+              <div id="simStrokeDuration" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: #00f0ff; margin-top: 0.2rem;">2.80 s</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-sm); text-align: center;">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Mechanical Drag</div>
+              <div id="simDragStatus" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--color-normal); margin-top: 0.2rem;">NOMINAL</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="doors.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.gcloudignore
+.git
+.gitignore
+data/Train/
+data/Test/*.csv
+!data/Test/Test1.csv
+!data/Test/Test2.csv
+!data/Test/Test11.csv
+data/train_features.csv
+Optional_Items/
+*.log
+venv/
+__pycache__/
+*.pyc

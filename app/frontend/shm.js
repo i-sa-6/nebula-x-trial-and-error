@@ -1,0 +1,356 @@
+// NEBULA-X: Structural Health Monitoring (SHM) Client Script
+
+let shmPredictionsData = null;
+let currentFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  fetchShmPredictions();
+  initSimulator();
+  handleHashNavigation();
+});
+
+// 1. Navigation & Tab Switching
+function initTabs() {
+  const tabBtns = document.querySelectorAll('.sub-tab-btn');
+  const navTabs = document.querySelectorAll('.nav-tabs .nav-tab');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      switchTab(targetId);
+    });
+  });
+
+  document.getElementById('navTabPredictions')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('pane-predictions');
+  });
+  document.getElementById('navTabAnalysis')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('pane-analysis');
+  });
+  document.getElementById('navTabTwin')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('pane-twin');
+  });
+}
+
+function switchTab(paneId) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-tabs .nav-tab').forEach(t => t.classList.remove('active'));
+
+  const targetPane = document.getElementById(paneId);
+  if (targetPane) targetPane.classList.add('active');
+
+  const activeBtn = document.querySelector(`.sub-tab-btn[data-target="${paneId}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (paneId === 'pane-predictions') {
+    document.getElementById('navTabPredictions')?.classList.add('active');
+    window.location.hash = 'predictions';
+  } else if (paneId === 'pane-analysis') {
+    document.getElementById('navTabAnalysis')?.classList.add('active');
+    window.location.hash = 'analysis';
+  } else if (paneId === 'pane-twin') {
+    document.getElementById('navTabTwin')?.classList.add('active');
+    window.location.hash = 'twin';
+    drawSnCurve();
+  }
+}
+
+function handleHashNavigation() {
+  const hash = window.location.hash;
+  if (hash === '#analysis') {
+    switchTab('pane-analysis');
+  } else if (hash === '#twin') {
+    switchTab('pane-twin');
+  } else {
+    switchTab('pane-predictions');
+  }
+}
+
+// 2. Fetch & Render SHM Predictions
+async function fetchShmPredictions() {
+  try {
+    const res = await fetch('/api/shm/predictions');
+    const data = await res.json();
+    shmPredictionsData = data;
+
+    // Populate KPIs
+    if (data.summary) {
+      document.getElementById('shmKpiTotal').textContent = data.summary.total_files;
+      document.getElementById('shmKpiLow').textContent = data.summary.low_risk;
+      document.getElementById('shmKpiMed').textContent = data.summary.medium_risk;
+      document.getElementById('shmKpiHigh').textContent = data.summary.high_risk;
+      document.getElementById('shmKpiAvgD').textContent = data.summary.avg_damage_index.toFixed(4);
+    }
+
+    renderTable();
+    initFilters();
+  } catch (err) {
+    console.error('Failed to fetch SHM predictions:', err);
+  }
+}
+
+function initFilters() {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderTable();
+    });
+  });
+
+  const searchInput = document.getElementById('shmSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      renderTable();
+    });
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('shmTableBody');
+  if (!tbody || !shmPredictionsData || !shmPredictionsData.predictions) return;
+
+  const searchQuery = (document.getElementById('shmSearchInput')?.value || '').toLowerCase();
+  tbody.innerHTML = '';
+
+  const filtered = shmPredictionsData.predictions.filter(item => {
+    // Severity filter
+    if (currentFilter === 'low' && item.severity !== 'Low Risk') return false;
+    if (currentFilter === 'medium' && item.severity !== 'Medium Risk') return false;
+    if (currentFilter === 'high' && item.severity !== 'High Risk') return false;
+
+    // Search filter
+    if (searchQuery && !item.file_id.toLowerCase().includes(searchQuery)) return false;
+
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-dim); padding: 2rem;">No matching stress recordings found.</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(row => {
+    const tr = document.createElement('tr');
+
+    let badgeColor = 'var(--color-normal)';
+    let badgeBg = 'rgba(16, 185, 129, 0.15)';
+    let badgeBorder = 'rgba(16, 185, 129, 0.3)';
+
+    if (row.severity === 'Medium Risk') {
+      badgeColor = 'var(--color-side1)';
+      badgeBg = 'rgba(245, 158, 11, 0.15)';
+      badgeBorder = 'rgba(245, 158, 11, 0.3)';
+    } else if (row.severity === 'High Risk') {
+      badgeColor = 'var(--color-danger)';
+      badgeBg = 'rgba(239, 68, 68, 0.15)';
+      badgeBorder = 'rgba(239, 68, 68, 0.3)';
+    }
+
+    const dPct = Math.min(100, Math.round(row.damage_index * 100));
+
+    tr.innerHTML = `
+      <td style="font-family: var(--font-mono); font-weight: 600; color: #fff;">${row.file_id}</td>
+      <td>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; width: 70px;">
+            <div style="width: ${dPct}%; height: 100%; background: ${badgeColor}; border-radius: 3px;"></div>
+          </div>
+          <span style="font-family: var(--font-mono); font-weight: 700; color: ${badgeColor};">${row.damage_index.toFixed(4)}</span>
+        </div>
+      </td>
+      <td>
+        <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; color: ${badgeColor}; background: ${badgeBg}; border: 1px solid ${badgeBorder};">
+          ${row.severity}
+        </span>
+      </td>
+      <td style="font-family: var(--font-mono);">${row.est_remaining_hours.toLocaleString()} hrs</td>
+      <td style="font-family: var(--font-mono);">${row.peak_stress_range_mpa} MPa</td>
+      <td style="font-family: var(--font-mono);">${row.cycle_count.toLocaleString()}</td>
+      <td style="font-size: 0.8rem; color: var(--text-muted);">${row.recommended_action}</td>
+      <td>
+        <button class="btn btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="inspectInTwin('${row.file_id}', ${row.damage_index}, ${row.peak_stress_range_mpa}, ${row.cycle_count})">
+          Inspect 🔬
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// 3. Inspect in Digital Twin Action
+window.inspectInTwin = function(fileId, dVal, stressVal, cycles) {
+  switchTab('pane-twin');
+  document.getElementById('twinActiveFileBadge').textContent = `Active: ${fileId}`;
+  
+  const sliderStress = document.getElementById('sliderStress');
+  const sliderCycles = document.getElementById('sliderCycles');
+  if (sliderStress) sliderStress.value = stressVal;
+  if (sliderCycles) sliderCycles.value = Math.min(250000, cycles);
+  
+  updateSimulator();
+};
+
+// 4. Interactive Fatigue Twin & S-N Wöhler Curve Simulator
+function initSimulator() {
+  const sliderStress = document.getElementById('sliderStress');
+  const sliderCycles = document.getElementById('sliderCycles');
+  const sliderLoad = document.getElementById('sliderLoad');
+
+  if (sliderStress) sliderStress.addEventListener('input', updateSimulator);
+  if (sliderCycles) sliderCycles.addEventListener('input', updateSimulator);
+  if (sliderLoad) sliderLoad.addEventListener('input', updateSimulator);
+
+  updateSimulator();
+}
+
+function updateSimulator() {
+  const stress = parseFloat(document.getElementById('sliderStress')?.value || 120);
+  const cycles = parseFloat(document.getElementById('sliderCycles')?.value || 50000);
+  const load = parseFloat(document.getElementById('sliderLoad')?.value || 1.2);
+
+  // Update labels
+  document.getElementById('sliderStressVal').textContent = `${stress} MPa`;
+  document.getElementById('sliderCyclesVal').textContent = `${cycles.toLocaleString()} cycles`;
+  document.getElementById('sliderLoadVal').textContent = `${load.toFixed(1)}x`;
+
+  // Basquin's Relation: N_fail = C / (Δσ * load)^m
+  // For structural bogie steel (e.g. S355): m = 3.5, C = 2.0e12
+  const effectiveStress = stress * load;
+  const N_fail = 2.0e12 / Math.pow(effectiveStress, 3.5);
+  const D = Math.min(1.0, Math.max(0.0001, cycles / N_fail));
+
+  // Remaining useful hours (assuming 2500 operating hours / year)
+  const remainingFraction = Math.max(0, 1.0 - D);
+  const remainingHours = Math.round(remainingFraction * 9000);
+  const remainingYears = (remainingHours / 2000).toFixed(1);
+
+  document.getElementById('simulatedDVal').textContent = D.toFixed(4);
+  document.getElementById('simulatedRulVal').textContent = `${remainingHours.toLocaleString()} hrs (~${remainingYears} yrs)`;
+
+  const badge = document.getElementById('simulatedStatusBadge');
+  if (badge) {
+    if (D < 0.10) {
+      badge.style.color = 'var(--color-normal)';
+      badge.style.background = 'rgba(16, 185, 129, 0.2)';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      badge.textContent = '● Low Risk • Full Structural Margin';
+    } else if (D < 0.50) {
+      badge.style.color = 'var(--color-side1)';
+      badge.style.background = 'rgba(245, 158, 11, 0.2)';
+      badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      badge.textContent = '● Medium Risk • Scheduled Ultrasonic NDT';
+    } else {
+      badge.style.color = 'var(--color-danger)';
+      badge.style.background = 'rgba(239, 68, 68, 0.2)';
+      badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+      badge.textContent = '● High Risk • Critical Fatigue Warning!';
+    }
+  }
+
+  drawSnCurve(effectiveStress, cycles);
+}
+
+function drawSnCurve(currentStress = 144, currentCycles = 50000) {
+  const canvas = document.getElementById('snCurveCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Background grid
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.lineWidth = 1;
+  const padLeft = 70;
+  const padBottom = 40;
+  const padTop = 20;
+  const padRight = 30;
+
+  for (let x = padLeft; x < w - padRight; x += 60) {
+    ctx.beginPath();
+    ctx.moveTo(x, padTop);
+    ctx.lineTo(x, h - padBottom);
+    ctx.stroke();
+  }
+
+  for (let y = padTop; y < h - padBottom; y += 40) {
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(w - padRight, y);
+    ctx.stroke();
+  }
+
+  // Draw Axes
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(padLeft, padTop);
+  ctx.lineTo(padLeft, h - padBottom);
+  ctx.lineTo(w - padRight, h - padBottom);
+  ctx.stroke();
+
+  // Axis Labels
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.fillText('10³', padLeft + 20, h - padBottom + 20);
+  ctx.fillText('10⁴', padLeft + 160, h - padBottom + 20);
+  ctx.fillText('10⁵', padLeft + 320, h - padBottom + 20);
+  ctx.fillText('10⁶', padLeft + 480, h - padBottom + 20);
+  ctx.fillText('10⁷', padLeft + 640, h - padBottom + 20);
+
+  ctx.fillText('300 MPa', 10, padTop + 10);
+  ctx.fillText('200 MPa', 10, padTop + 90);
+  ctx.fillText('100 MPa', 10, padTop + 170);
+  ctx.fillText('30 MPa', 10, h - padBottom - 10);
+
+  // Draw Basquin S-N Curve: log(N) vs Stress
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+
+  const plotW = w - padLeft - padRight;
+  const plotH = h - padTop - padBottom;
+
+  for (let px = 0; px <= plotW; px += 4) {
+    const logN = 3 + (px / plotW) * 4; // 10^3 to 10^7
+    const N = Math.pow(10, logN);
+    // Stress = (C / N)^(1/m)
+    const curveStress = Math.pow(2.0e12 / N, 1 / 3.5);
+    const py = padTop + plotH - ((curveStress - 30) / (300 - 30)) * plotH;
+
+    if (px === 0) ctx.moveTo(padLeft + px, Math.max(padTop, Math.min(h - padBottom, py)));
+    else ctx.lineTo(padLeft + px, Math.max(padTop, Math.min(h - padBottom, py)));
+  }
+  ctx.stroke();
+
+  // Draw Current Operating Point
+  const currentLogN = Math.log10(Math.max(1000, currentCycles));
+  const ptX = padLeft + ((currentLogN - 3) / 4) * plotW;
+  const ptY = padTop + plotH - ((currentStress - 30) / (300 - 30)) * plotH;
+
+  if (ptX >= padLeft && ptX <= w - padRight && ptY >= padTop && ptY <= h - padBottom) {
+    // Glowing circle
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(ptX, ptY, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.fillText(`Δσ: ${currentStress.toFixed(0)} MPa`, ptX + 10, ptY - 8);
+  }
+}
+window.addEventListener('resize', () => drawSnCurve());
