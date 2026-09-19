@@ -1,0 +1,3 @@
+model,aggregation,primary_metric_mean,mrr_secondary_mean,ranks_by_file,n_files_with_tied_rank
+elliptic_envelope,p90,0.925,0.85,"{'acv_case_01.xlsx': 1, 'acv_case_02.xlsx': 1, 'acv_case_03.xlsx': 1, 'acv_case_05.xlsx': 4, 'acv_case_06.xlsx': 1}",0
+elliptic_envelope,median,0.775,0.5833333333333333,"{'acv_case_01.xlsx': 2, 'acv_case_02.xlsx': 6, 'acv_case_03.xlsx': 1, 'acv_case_05.xlsx': 4, 'acv_case_06.xlsx': 1}",1

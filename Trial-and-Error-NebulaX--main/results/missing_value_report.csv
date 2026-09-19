@@ -1,0 +1,6 @@
+case_id,n_total_rows,n_missing_rows,frac_missing,strategy,n_rows_after,n_residual_dropped
+acv_case_01.xlsx,55992,5416,0.09672810401485926,forward_fill,55992,0
+acv_case_02.xlsx,73496,6440,0.08762381626210951,forward_fill,73496,0
+acv_case_03.xlsx,66480,0,0.0,drop,66480,0
+acv_case_05.xlsx,55776,5392,0.09667240390131956,forward_fill,55776,0
+acv_case_06.xlsx,26104,3584,0.13729696598222493,forward_fill,26104,0

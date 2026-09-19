@@ -1,0 +1,1 @@
+[acv_case_02.xlsx] elliptic_envelope/median: true car 02's rank (6) was decided by tie-break order -- 2 of 8 cars share the exact same median score.

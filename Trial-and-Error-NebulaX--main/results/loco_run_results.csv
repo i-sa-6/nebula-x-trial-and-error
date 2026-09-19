@@ -1,0 +1,11 @@
+case_id,model,aggregation,rank_of_true_car,primary_metric,mrr_secondary,n_tied_with_true_car
+acv_case_01.xlsx,elliptic_envelope,median,2,0.875,0.5,1
+acv_case_01.xlsx,elliptic_envelope,p90,1,1.0,1.0,1
+acv_case_02.xlsx,elliptic_envelope,median,6,0.375,0.16666666666666666,2
+acv_case_02.xlsx,elliptic_envelope,p90,1,1.0,1.0,1
+acv_case_03.xlsx,elliptic_envelope,median,1,1.0,1.0,1
+acv_case_03.xlsx,elliptic_envelope,p90,1,1.0,1.0,1
+acv_case_05.xlsx,elliptic_envelope,median,4,0.625,0.25,1
+acv_case_05.xlsx,elliptic_envelope,p90,4,0.625,0.25,1
+acv_case_06.xlsx,elliptic_envelope,median,1,1.0,1.0,1
+acv_case_06.xlsx,elliptic_envelope,p90,1,1.0,1.0,1

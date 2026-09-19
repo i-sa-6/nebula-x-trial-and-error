@@ -1,0 +1,8 @@
+param,category,count,frequency,merged_into
+ACV Running Mode,Emergency Ventilation,2223,0.008000777403472402,Other
+ACV Running Mode,Ventilation,623,0.002242233163456278,Other
+ACV Running Mode,Full Cooling,167,0.0006010480550516829,Other
+ACV Running Mode,Invalid,108,0.00038870173620108835,Other
+ACV Running Mode,Half Cooling,14,5.038726210014109e-05,Other
+ACV Setting Mode,Invalid,71,0.0002555354006507155,Other
+ACV Information Valid,Invalid,71,0.0002555354006507155,Other
