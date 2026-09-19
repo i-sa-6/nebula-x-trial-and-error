@@ -17,11 +17,24 @@ import pandas as pd
 
 # Add paths to sys.path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if BASE_DIR not in sys.path:
-    sys.path.append(BASE_DIR)
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
+for p in [BASE_DIR, MODEL_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from door_segmentation import segment_door_data
-from model.feature_extractor import extract_cycle_features
+try:
+    from door_segmentation import segment_door_data
+except ImportError:
+    try:
+        from model.door_segmentation import segment_door_data
+    except ImportError:
+        import door_segmentation
+        segment_door_data = door_segmentation.segment_door_data
+
+try:
+    from model.feature_extractor import extract_cycle_features
+except ImportError:
+    from feature_extractor import extract_cycle_features
 
 
 def parse_datetime(ts_str: str) -> datetime:

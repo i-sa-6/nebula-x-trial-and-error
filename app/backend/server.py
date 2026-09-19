@@ -1352,10 +1352,12 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
             import subprocess, tempfile
             out_tmp = tempfile.NamedTemporaryFile(suffix=".csv", delete=False)
             out_tmp.close()
+            door_env = dict(os.environ)
+            door_env["PYTHONPATH"] = f"{BASE_DIR}:{os.path.join(BASE_DIR, 'model')}:" + door_env.get("PYTHONPATH", "")
             result = subprocess.run(
                 [sys.executable, os.path.join(BASE_DIR, "model", "predict.py"),
                  "--input", fpath, "--output", out_tmp.name],
-                capture_output=True, text=True, cwd=BASE_DIR, timeout=60
+                capture_output=True, text=True, cwd=BASE_DIR, env=door_env, timeout=60
             )
             if result.returncode != 0:
                 self.send_error_json(f"Door inference error: {result.stderr[:400]}"); return

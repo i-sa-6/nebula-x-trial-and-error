@@ -27,6 +27,7 @@ COPY PS3/ ./PS3/
 COPY app/ ./app/
 COPY submission/ ./submission/
 COPY predict.py .
+COPY door_segmentation.py .
 
 # Prepare data directories
 RUN mkdir -p data/Test data/Train
