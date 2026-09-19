@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NebulaX - Train Condition Monitoring (Rail Corrugation Diagnostic System)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">🚆</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem">PS3: Rail Corrugation</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — Automated Train Condition Monitoring</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab active">🚆 Live Diagnostic Twin</a>
+      <a href="accuracy.html" class="nav-tab">📊 Model Accuracy</a>
+    </nav>
+
+    <!-- Integrated Clean Selector in Header -->
+    <div class="nav-center-controls">
+      <label for="fileSelect" class="select-label">Recording:</label>
+      <select id="fileSelect" class="styled-select">
+        <option value="">Loading files...</option>
+      </select>
+    </div>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight">
+        <span class="pill-label">MACRO F1</span>
+        <span class="pill-value" id="modelF1">0.8507</span>
+      </div>
+      <button id="btnDownloadZip" class="btn btn-success" title="Download official competition predictions.zip">
+        <span class="btn-icon">📦</span> Download predictions.zip
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+    
+    <!-- 1. 8-Car Train Digital Twin Schematic -->
+    <section class="glass-panel digital-twin-card">
+      <div class="panel-header">
+        <div>
+          <h3>8-CAR TRAIN DIGITAL TWIN SCHEMATIC</h3>
+          <p class="panel-desc">Axle-box vibration intensity across 64 wheelsets (Cars 1–8, Positions 1–8)</p>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="dot dot-green"></span> Healthy (&lt;0.35 m/s²)</span>
+          <span class="legend-item"><span class="dot dot-amber"></span> Elevated (0.35–0.70 m/s²)</span>
+          <span class="legend-item"><span class="dot dot-red"></span> Corrugated (&gt;0.70 m/s²)</span>
+        </div>
+      </div>
+
+      <!-- Train Track Schematic Layout -->
+      <div class="train-schematic-wrapper">
+        <div class="rail-indicator top-rail">SIDE I RAIL (Odd Wheels: 1, 3, 5, 7)</div>
+        <div class="train-consist" id="trainConsist">
+          <!-- Dynamically populated 8 cars -->
+        </div>
+        <div class="rail-indicator bottom-rail">SIDE II RAIL (Even Wheels: 2, 4, 6, 8)</div>
+      </div>
+      <div class="wheel-inspect-bar" id="wheelInspectBar">
+        Hover over any axle-box wheel above to inspect its live RMS vibration and shock readings.
+      </div>
+    </section>
+
+    <!-- 2. Recommended Actions & Diagnostic Verdict -->
+    <section class="glass-panel recommendation-card">
+      <div class="verdict-banner">
+        <div class="verdict-badge-group">
+          <div class="verdict-icon" id="verdictIcon">🔍</div>
+          <div>
+            <div class="verdict-title" id="verdictTitle">AWAITING SELECTION</div>
+            <div class="verdict-subtitle" id="verdictSubtitle">Select a recording above to run real-time diagnostics</div>
+          </div>
+        </div>
+        <div class="verdict-meta">
+          <span class="confidence-tag" id="confidenceVal">Confidence: --%</span>
+          <span class="urgency-badge" id="urgencyBadge">READY</span>
+        </div>
+      </div>
+
+      <div class="action-box">
+        <div class="action-header">
+          <span class="action-icon">📋</span>
+          <h4>RECOMMENDED ACTIONS (LTA Track Maintenance Division)</h4>
+          <span id="streamBadge" class="stream-meta-badge" style="display:none;">⚡ STREAMING</span>
+        </div>
+        <div class="recommendation-content" id="recommendationText">
+          Select a test file to generate engineering maintenance instructions based on localized wheelset vibrations.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NebulaX - Model Accuracy & Performance Benchmark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">🚆</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem">PS3: Rail Corrugation</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — Automated Train Condition Monitoring</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab">🚆 Live Diagnostic Twin</a>
+      <a href="accuracy.html" class="nav-tab active">📊 Model Accuracy</a>
+    </nav>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight">
+        <span class="pill-label">MACRO F1</span>
+        <span class="pill-value">0.8507</span>
+      </div>
+      <button id="btnDownloadZip" class="btn btn-success" title="Download official competition predictions.zip">
+        <span class="btn-icon">📦</span> Download predictions.zip
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <main class="dashboard-container">
+    
+    <!-- Hero Summary Banner -->
+    <section class="glass-panel" style="padding: 1.5rem 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.6rem;">
+            <span>📊</span> MODEL ACCURACY & PERFORMANCE BENCHMARK
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+            Comprehensive audit of 5-Fold Stratified Cross-Validation on 272 ground-truth training recordings and held-out test set predictions (68 files).
+          </p>
+        </div>
+        <div>
+          <span class="stream-meta-badge" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">
+            🏆 Champion Model: Ensemble (50% HGB + 50% LR)
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Key Metrics Cards -->
+    <div class="stat-grid-4">
+      <div class="stat-card primary">
+        <span class="stat-label">PRIMARY METRIC (MACRO F1)</span>
+        <span class="stat-value">0.8507</span>
+        <span class="stat-sub">5-Fold Stratified Cross-Validation (Zero Data Leakage)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">OVERALL ACCURACY</span>
+        <span class="stat-value">95.59%</span>
+        <span class="stat-sub">260 of 272 training recordings correctly diagnosed</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">HEALTHY RAIL (NORMAL) F1</span>
+        <span class="stat-value">0.9807</span>
+        <span class="stat-sub">98.28% Precision | 97.86% Recall (229/234 True Positives)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">CORRUGATION FAULT F1</span>
+        <span class="stat-value">Side I: 0.714 | Side II: 0.857</span>
+        <span class="stat-sub">Side I (Left): 71.4% Recall | Side II (Right): 87.5% Recall</span>
+      </div>
+    </div>
+
+    <!-- SECTION 1: TRAINING DATA PERFORMANCE (5-FOLD CV) -->
+    <section class="glass-panel">
+      <div class="panel-header">
+        <div>
+          <h3>1. TRAINING SET PERFORMANCE (5-FOLD STRATIFIED CROSS-VALIDATION)</h3>
+          <p class="panel-desc">Rigorous out-of-fold validation on all 272 ground-truth files (234 Normal, 14 Side I, 24 Side II) avoiding synthetic data contamination.</p>
+        </div>
+      </div>
+
+      <!-- Grid for Table and Confusion Matrix -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem; margin-top: 0.5rem;">
+        
+        <!-- Detailed Classification Report Table -->
+        <div>
+          <h4 style="font-size: 0.825rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.5px;">
+            Per-Class Classification Metrics (Out-of-Fold)
+          </h4>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Class / Subsystem</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-Score</th>
+                  <th>Support (N)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge-class badge-Normal">Normal (Healthy)</span></td>
+                  <td class="mono-val">98.28%</td>
+                  <td class="mono-val">97.86%</td>
+                  <td class="mono-val" style="color: var(--color-normal);">0.9807</td>
+                  <td class="mono-val">234</td>
+                </tr>
+                <tr>
+                  <td><span class="badge-class badge-Side-I">Side I Corrugation</span></td>
+                  <td class="mono-val">71.43%</td>
+                  <td class="mono-val">71.43%</td>
+                  <td class="mono-val" style="color: var(--color-side1);">0.7143</td>
+                  <td class="mono-val">14</td>
+                </tr>
+                <tr>
+                  <td><span class="badge-class badge-Side-II">Side II Corrugation</span></td>
+                  <td class="mono-val">84.00%</td>
+                  <td class="mono-val">87.50%</td>
+                  <td class="mono-val" style="color: var(--color-side2);">0.8571</td>
+                  <td class="mono-val">24</td>
+                </tr>
+                <tr style="border-top: 2px solid var(--border-color); background: rgba(0, 240, 255, 0.04);">
+                  <td><strong>Macro Average</strong></td>
+                  <td class="mono-val"><strong>84.57%</strong></td>
+                  <td class="mono-val"><strong>85.60%</strong></td>
+                  <td class="mono-val" style="color: var(--primary);"><strong>0.8507</strong></td>
+                  <td class="mono-val"><strong>272</strong></td>
+                </tr>
+                <tr style="background: rgba(255, 255, 255, 0.02);">
+                  <td><strong>Weighted Average</strong></td>
+                  <td class="mono-val">95.66%</td>
+                  <td class="mono-val">95.59%</td>
+                  <td class="mono-val">0.9559</td>
+                  <td class="mono-val">272</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3x3 Confusion Matrix -->
+        <div>
+          <h4 style="font-size: 0.825rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.5px;">
+            5-Fold Confusion Matrix (Total N = 272)
+          </h4>
+          <div class="table-wrapper" style="padding: 1.25rem;">
+            <table class="confusion-grid" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>Ground Truth \ Predicted</th>
+                  <th>Pred. Normal</th>
+                  <th>Pred. Side I</th>
+                  <th>Pred. Side II</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th style="text-align: left;"><span class="badge-class badge-Normal">True Normal (234)</span></th>
+                  <td class="cell-diag" title="229 True Normal Correct">229</td>
+                  <td class="cell-error" title="2 False Alarms on Side I">2</td>
+                  <td class="cell-error" title="3 False Alarms on Side II">3</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left;"><span class="badge-class badge-Side-I">True Side I (14)</span></th>
+                  <td class="cell-error" title="3 Missed Side I Defects">3</td>
+                  <td class="cell-diag" title="10 Correctly Detected Side I Defects">10</td>
+                  <td class="cell-error" title="1 Cross-rail Misclassification">1</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left;"><span class="badge-class badge-Side-II">True Side II (24)</span></th>
+                  <td class="cell-error" title="1 Missed Side II Defect">1</td>
+                  <td class="cell-error" title="2 Cross-rail Misclassifications">2</td>
+                  <td class="cell-diag" title="21 Correctly Detected Side II Defects">21</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-dim); text-align: center;">
+              Green cells indicate correct out-of-fold diagnoses (260/272 = 95.59% accuracy).
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Multi-Model Benchmark Comparison -->
+      <div style="margin-top: 1.75rem;">
+        <h4 style="font-size: 0.825rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.75rem; letter-spacing: 0.5px;">
+          Algorithm Benchmark Comparison (5-Fold Cross-Validation)
+        </h4>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Primary Metric (Macro F1)</th>
+                <th>Normal F1</th>
+                <th>Side I F1</th>
+                <th>Side II F1</th>
+                <th>Status / Decision</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Balanced Random Forest</td>
+                <td class="mono-val">0.6387</td>
+                <td class="mono-val">0.9605</td>
+                <td class="mono-val" style="color: #f87171;">0.1111</td>
+                <td class="mono-val">0.8444</td>
+                <td><span style="color: var(--text-dim);">Overfits majority class</span></td>
+              </tr>
+              <tr>
+                <td>Balanced Logistic Regression (Physics Features)</td>
+                <td class="mono-val">0.7310</td>
+                <td class="mono-val">0.9522</td>
+                <td class="mono-val">0.4324</td>
+                <td class="mono-val">0.8085</td>
+                <td><span style="color: var(--text-muted);">High recall linear baseline</span></td>
+              </tr>
+              <tr>
+                <td>Histogram Gradient Boosting (Balanced)</td>
+                <td class="mono-val">0.8253</td>
+                <td class="mono-val">0.9787</td>
+                <td class="mono-val">0.6400</td>
+                <td class="mono-val">0.8571</td>
+                <td><span style="color: var(--color-side1);">Strong non-linear capture</span></td>
+              </tr>
+              <tr class="champion-row">
+                <td><strong style="color: var(--primary);">🏆 Champion Ensemble (50% HGB + 50% LR)</strong></td>
+                <td class="mono-val" style="color: var(--primary); font-size: 1rem;"><strong>0.8507</strong></td>
+                <td class="mono-val"><strong>0.9807</strong></td>
+                <td class="mono-val" style="color: var(--color-normal);"><strong>0.7143</strong></td>
+                <td class="mono-val" style="color: var(--color-normal);"><strong>0.8571</strong></td>
+                <td><span class="stream-meta-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: #34d399;">SELECTED CHAMPION</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: HELD-OUT TEST DATA BREAKDOWN (68 FILES) -->
+    <section class="glass-panel">
+      <div class="panel-header">
+        <div>
+          <h3>2. HELD-OUT TEST SET PERFORMANCE (68 TEST FILES)</h3>
+          <p class="panel-desc">Automated condition monitoring predictions for Test1.csv to Test68.csv packaged in official predictions.zip.</p>
+        </div>
+      </div>
+
+      <!-- Test Summary Stat Cards -->
+      <div class="stat-grid-4" style="margin-bottom: 1.5rem;">
+        <div class="stat-card">
+          <span class="stat-label">TOTAL TEST RECORDINGS</span>
+          <span class="stat-value" id="testTotalCount">68</span>
+          <span class="stat-sub">100% Validated & Formatted</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">PREDICTED NORMAL</span>
+          <span class="stat-value" style="color: var(--color-normal);" id="testNormalCount">60 (88.2%)</span>
+          <span class="stat-sub">Healthy rail acoustic telemetry</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">SIDE I DEFECTS IDENTIFIED</span>
+          <span class="stat-value" style="color: var(--color-side1);" id="testSide1Count">4 (5.9%)</span>
+          <span class="stat-sub">Left rail corrugation wear</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">SIDE II DEFECTS IDENTIFIED</span>
+          <span class="stat-value" style="color: var(--color-side2);" id="testSide2Count">4 (5.9%)</span>
+          <span class="stat-sub">Right rail corrugation wear</span>
+        </div>
+      </div>
+
+      <!-- Defect Highlights Card -->
+      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.825rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 0.6rem; letter-spacing: 0.5px;">
+          ⚡ Critical Corrugation Defect Detections in Held-Out Test Set:
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+          <div>
+            <span style="font-size: 0.775rem; font-weight: 700; color: var(--color-side1);">Side I (Left Rail) Priority Work Orders:</span>
+            <ul style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; list-style-type: none; padding: 0; line-height: 1.7;">
+              <li>• <strong style="color:#fff;">Test22.csv</strong>: 41.7 km/h, Confidence 54.7%, Bilateral SDI = +0.114</li>
+              <li>• <strong style="color:#fff;">Test27.csv</strong>: 40.6 km/h, Confidence 98.2%, λ ≈ 23.6 mm corrugation</li>
+              <li>• <strong style="color:#fff;">Test32.csv</strong>: 45.2 km/h, Confidence 59.9%, Bilateral SDI = +0.063</li>
+              <li>• <strong style="color:#fff;">Test33.csv</strong>: 46.1 km/h, Confidence 99.3%, Bilateral SDI = +0.046</li>
+            </ul>
+          </div>
+          <div>
+            <span style="font-size: 0.775rem; font-weight: 700; color: var(--color-side2);">Side II (Right Rail) Priority Work Orders:</span>
+            <ul style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; list-style-type: none; padding: 0; line-height: 1.7;">
+              <li>• <strong style="color:#fff;">Test26.csv</strong>: 57.5 km/h, Confidence 100.0%, Bilateral SDI = -0.171</li>
+              <li>• <strong style="color:#fff;">Test36.csv</strong>: 54.9 km/h, Confidence 45.7%, λ ≈ 173.5 mm wear</li>
+              <li>• <strong style="color:#fff;">Test43.csv</strong>: 56.4 km/h, Confidence 99.9%, Bilateral SDI = -0.101</li>
+              <li>• <strong style="color:#fff;">Test66.csv</strong>: 47.2 km/h, Confidence 100.0%, Bilateral SDI = -0.065</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive 68 Test Files Explorer Table -->
+      <div>
+        <!-- Filter Toolbar -->
+        <div class="filter-toolbar">
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All (68)</button>
+            <button class="filter-btn" data-filter="Normal">Normal (60)</button>
+            <button class="filter-btn" data-filter="Side I">Side I Defects (4)</button>
+            <button class="filter-btn" data-filter="Side II">Side II Defects (4)</button>
+          </div>
+          <input type="text" id="tableSearch" class="search-input" placeholder="🔍 Search test recording, class, speed...">
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="testDataTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Recording File</th>
+                <th>Predicted Condition</th>
+                <th>Confidence</th>
+                <th>Train Speed</th>
+                <th>Bilateral Asymmetry (SDI)</th>
+                <th>Diagnostic Action</th>
+              </tr>
+            </thead>
+            <tbody id="testTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-dim); padding: 2rem;">Loading test dataset predictions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="accuracy.js"></script>
+</body>
+</html>
