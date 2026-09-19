@@ -442,23 +442,63 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
             "zip_file": "predictions.zip"
         })
 
+    def _create_all_predictions_zip(self, target_zip_path):
+        """Bundles all predicted test cases across all 4 condition monitoring subsystems into a single ZIP archive."""
+        files_to_pack = [
+            ("rail_predictions.csv", "PS3 Subsystem 3: Rail Corrugation Anomaly Detection & Bilateral Localization (68 recordings)"),
+            ("shm_predictions.csv", "PS3 Subsystem 4: Structural Health Monitoring Fatigue Damage Index (16 recordings)"),
+            ("acv_predictions.csv", "PS3 Subsystem 2: ACV Refrigerant-Leak Fault Localization & Consist Ranking (6 cases)"),
+            ("door_predictions.csv", "PS3 Subsystem 1: Train Doors Resistance Classification & Cycle Segmentation (38 cycles)"),
+            ("rail_predictions_detailed.csv", "Rail Corrugation Detailed Diagnostic Features (Speed, SDI, Confidence)")
+        ]
+        import zipfile
+        os.makedirs(os.path.dirname(target_zip_path), exist_ok=True)
+        with zipfile.ZipFile(target_zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            manifest_lines = [
+                "=================================================================",
+                " NEBULA-X 2026: UNIFIED CONDITION MONITORING PREDICTIONS PACKAGE",
+                " Problem Statement 3: Advanced Train Condition Monitoring",
+                "=================================================================",
+                "",
+                "This archive contains complete predicted test cases across all four subsystems:",
+                ""
+            ]
+            for fname, desc in files_to_pack:
+                src_path = os.path.join(SUBMISSION_DIR, fname)
+                if not os.path.exists(src_path):
+                    src_path = os.path.join(BASE_DIR, fname)
+                if os.path.exists(src_path):
+                    zf.write(src_path, arcname=fname)
+                    try:
+                        with open(src_path, "r", encoding="utf-8") as f:
+                            row_count = sum(1 for _ in f) - 1
+                        manifest_lines.append(f"  [✓] {fname:<30} ({row_count:>3} records) -> {desc}")
+                    except Exception:
+                        manifest_lines.append(f"  [✓] {fname:<30} -> {desc}")
+                else:
+                    manifest_lines.append(f"  [!] {fname:<30} -> (Not found)")
+            
+            manifest_lines.extend([
+                "",
+                "Subsystem Details:",
+                "1. rail_predictions.csv : 68 test files (Normal, Side I Left, Side II Right corrugation)",
+                "2. shm_predictions.csv  : 16 test files (Continuous fatigue damage index D from strain telemetry)",
+                "3. acv_predictions.csv  : 6 cases (Ranked sequence, e.g. 01|04|08... pointing to Car 01)",
+                "4. door_predictions.csv : 38 door cycles (Normal vs Abnormal Resistance at 50Hz)",
+                "",
+                "Platform URL: https://nebula-rail-twin-515716532383.asia-southeast1.run.app"
+            ])
+            zf.writestr("README_PREDICTIONS.txt", "\n".join(manifest_lines))
+        return target_zip_path
+
     def handle_download_zip(self):
         zip_path = os.path.join(SUBMISSION_DIR, "predictions.zip")
-        if not os.path.exists(zip_path):
-            # create it if rail_predictions.csv exists
-            pred_csv = os.path.join(SUBMISSION_DIR, "rail_predictions.csv")
-            if os.path.exists(pred_csv):
-                with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-                    z.write(pred_csv, arcname="rail_predictions.csv")
-            else:
-                self.send_error(404, "Predictions zip not yet generated")
-                return
-                
+        self._create_all_predictions_zip(zip_path)
         with open(zip_path, "rb") as f:
             content = f.read()
         self.send_response(200)
         self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Disposition", 'attachment; filename="predictions.zip"')
+        self.send_header("Content-Disposition", 'attachment; filename="nebula_x_all_predictions.zip"')
         self.send_header("Content-Length", str(len(content)))
         self.end_headers()
         self.wfile.write(content)
@@ -824,23 +864,15 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
 
     def handle_download_master_submission(self):
         zip_path = os.path.join(SUBMISSION_DIR, "master_submission.zip")
-        import zipfile
-        with zipfile.ZipFile(zip_path, 'w') as zf:
-            for f in ["rail_predictions.csv", "shm_predictions.csv", "acv_predictions.csv", "door_predictions.csv"]:
-                fp = os.path.join(SUBMISSION_DIR, f)
-                if os.path.exists(fp):
-                    zf.write(fp, arcname=f)
-        if os.path.exists(zip_path):
-            with open(zip_path, "rb") as f:
-                content = f.read()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/zip")
-            self.send_header("Content-Disposition", 'attachment; filename="master_submission.zip"')
-            self.send_header("Content-Length", str(len(content)))
-            self.end_headers()
-            self.wfile.write(content)
-        else:
-            self.send_error_json("Master submission zip not found.")
+        self._create_all_predictions_zip(zip_path)
+        with open(zip_path, "rb") as f:
+            content = f.read()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Disposition", 'attachment; filename="nebula_x_all_subsystems_predictions.zip"')
+        self.send_header("Content-Length", str(len(content)))
+        self.end_headers()
+        self.wfile.write(content)
 
     # ------------------------------------------------------------------ #
     #  SHM helpers & endpoints (Log Extra Trees Champion)                  #

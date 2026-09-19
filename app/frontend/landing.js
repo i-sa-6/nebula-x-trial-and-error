@@ -21,7 +21,7 @@ function setupEventListeners() {
   if (btnZip) {
     btnZip.addEventListener('click', () => {
       window.location.href = '/api/download_predictions';
-      showToast('📦 Downloading official predictions.zip...');
+      showToast('📦 Downloading complete predictions for all 4 subsystems (Rail, SHM, ACV, Doors)...');
     });
   }
 
