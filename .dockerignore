@@ -1,0 +1,14 @@
+# Exclude heavy raw datasets (5.5 GB) - model bundle and test files are tracked
+data/Train/
+data/train_features.csv
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.vscode/
+.idea/
+Optional_Items/
+*.log

@@ -604,17 +604,19 @@ def prewarm_cache():
         print(f"[✓] Full memory cache ready: {len(ANALYSIS_CACHE)} files pre-computed for instant 0ms switching.")
     threading.Thread(target=worker, daemon=True).start()
 
-def run_server(port=8080):
+def run_server(port=None):
     os.makedirs(SUBMISSION_DIR, exist_ok=True)
     prewarm_cache()
-    # Explicitly bind to 127.0.0.1 to avoid macOS IPv6 (::1) localhost resolution lag
-    server_address = ("127.0.0.1", port)
+    if port is None:
+        port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8080))
+    # In cloud environments (Cloud Run, Docker) bind to 0.0.0.0; locally bind to 127.0.0.1
+    host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("CONTAINER") or os.environ.get("K_SERVICE") else "127.0.0.1")
+    server_address = (host, port)
     httpd = HTTPServer(server_address, DashboardRequestHandler)
-    print(f"\n[★] NebulaX Rail Corrugation Dashboard running at: http://127.0.0.1:{port}")
+    print(f"\n[★] NebulaX Rail Corrugation Dashboard running at: http://{host}:{port}")
     httpd.serve_forever()
 
-
-
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    env_port = os.environ.get("PORT")
+    port = int(env_port) if env_port else (int(sys.argv[1]) if len(sys.argv) > 1 else 8080)
     run_server(port)

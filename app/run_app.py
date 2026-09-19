@@ -14,12 +14,12 @@ if BASE_DIR not in sys.path:
 from app.backend.server import run_server
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    env_port = os.environ.get("PORT")
+    port = int(env_port) if env_port else (int(sys.argv[1]) if len(sys.argv) > 1 else 8080)
     print("=" * 65)
     print(" 🚆 NEBULA-X: RAIL CORRUGATION CONDITION MONITORING APP")
     print("=" * 65)
-    print(f" Starting server on: http://127.0.0.1:{port}")
-    print(" (Direct IPv4 binding eliminates macOS IPv6 localhost DNS resolution lag)")
+    print(f" Starting server on port: {port}")
     print(" Press Ctrl+C to stop the server.")
     print("=" * 65)
     run_server(port)
