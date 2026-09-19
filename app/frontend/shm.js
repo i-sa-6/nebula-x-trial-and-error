@@ -107,10 +107,25 @@ function initFilters() {
 
   const searchInput = document.getElementById('shmSearchInput');
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      renderTable();
-    });
+    searchInput.addEventListener('input', () => renderTable());
   }
+}
+
+// Map API severity string to our internal filter key
+function getSeverityFilter(severity) {
+  if (!severity) return 'low';
+  const s = severity.toLowerCase();
+  if (s.startsWith('high')) return 'high';
+  if (s.startsWith('medium')) return 'medium';
+  return 'low';
+}
+
+// Map API severity string to display label & colours
+function getSeverityStyle(severity) {
+  const key = getSeverityFilter(severity);
+  if (key === 'high') return { label: 'High Risk', color: 'var(--color-danger)', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)' };
+  if (key === 'medium') return { label: 'Medium Risk', color: 'var(--color-side1)', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' };
+  return { label: 'Low Risk', color: 'var(--color-normal)', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)' };
 }
 
 function renderTable() {
@@ -121,14 +136,10 @@ function renderTable() {
   tbody.innerHTML = '';
 
   const filtered = shmPredictionsData.predictions.filter(item => {
-    // Severity filter
-    if (currentFilter === 'low' && item.severity !== 'Low Risk') return false;
-    if (currentFilter === 'medium' && item.severity !== 'Medium Risk') return false;
-    if (currentFilter === 'high' && item.severity !== 'High Risk') return false;
-
+    // Severity filter — compare against the filter key derived from the API value
+    if (currentFilter !== 'all' && getSeverityFilter(item.severity) !== currentFilter) return false;
     // Search filter
     if (searchQuery && !item.file_id.toLowerCase().includes(searchQuery)) return false;
-
     return true;
   });
 
@@ -140,43 +151,38 @@ function renderTable() {
   filtered.forEach(row => {
     const tr = document.createElement('tr');
 
-    let badgeColor = 'var(--color-normal)';
-    let badgeBg = 'rgba(16, 185, 129, 0.15)';
-    let badgeBorder = 'rgba(16, 185, 129, 0.3)';
+    // Map API fields to display values
+    const damageIndex   = row.damage_index   ?? row.prediction ?? 0;
+    const remainingHrs  = row.est_remaining_hours ?? row.remaining_hours ?? 0;
+    const peakStress    = row.peak_stress_range_mpa ?? row.stress_range ?? row.max_stress ?? 0;
+    const cycleCount    = row.cycle_count    ?? row.cycles   ?? 0;
+    const action        = row.recommended_action ?? row.notes ?? '—';
 
-    if (row.severity === 'Medium Risk') {
-      badgeColor = 'var(--color-side1)';
-      badgeBg = 'rgba(245, 158, 11, 0.15)';
-      badgeBorder = 'rgba(245, 158, 11, 0.3)';
-    } else if (row.severity === 'High Risk') {
-      badgeColor = 'var(--color-danger)';
-      badgeBg = 'rgba(239, 68, 68, 0.15)';
-      badgeBorder = 'rgba(239, 68, 68, 0.3)';
-    }
-
-    const dPct = Math.min(100, Math.round(row.damage_index * 100));
+    const style = getSeverityStyle(row.severity);
+    const dPct  = Math.min(100, Math.round(damageIndex * 100));
 
     tr.innerHTML = `
       <td style="font-family: var(--font-mono); font-weight: 600; color: #fff;">${row.file_id}</td>
       <td>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <div style="flex-grow: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; width: 70px;">
-            <div style="width: ${dPct}%; height: 100%; background: ${badgeColor}; border-radius: 3px;"></div>
+            <div style="width: ${dPct}%; height: 100%; background: ${style.color}; border-radius: 3px;"></div>
           </div>
-          <span style="font-family: var(--font-mono); font-weight: 700; color: ${badgeColor};">${row.damage_index.toFixed(4)}</span>
+          <span style="font-family: var(--font-mono); font-weight: 700; color: ${style.color};">${damageIndex.toFixed(4)}</span>
         </div>
       </td>
       <td>
-        <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; color: ${badgeColor}; background: ${badgeBg}; border: 1px solid ${badgeBorder};">
-          ${row.severity}
+        <span style="display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; color: ${style.color}; background: ${style.bg}; border: 1px solid ${style.border};">
+          ${style.label}
         </span>
       </td>
-      <td style="font-family: var(--font-mono);">${row.est_remaining_hours.toLocaleString()} hrs</td>
-      <td style="font-family: var(--font-mono);">${row.peak_stress_range_mpa} MPa</td>
-      <td style="font-family: var(--font-mono);">${row.cycle_count.toLocaleString()}</td>
-      <td style="font-size: 0.8rem; color: var(--text-muted);">${row.recommended_action}</td>
+      <td style="font-family: var(--font-mono);">${Number(remainingHrs).toLocaleString()} hrs</td>
+      <td style="font-family: var(--font-mono);">${Number(peakStress).toFixed(1)} MPa</td>
+      <td style="font-family: var(--font-mono);">${Number(cycleCount).toLocaleString()}</td>
+      <td style="font-size: 0.8rem; color: var(--text-muted);">${action}</td>
       <td>
-        <button class="btn btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="inspectInTwin('${row.file_id}', ${row.damage_index}, ${row.peak_stress_range_mpa}, ${row.cycle_count})">
+        <button class="btn btn-primary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;"
+          onclick="inspectInTwin('${row.file_id}', ${damageIndex}, ${Number(peakStress).toFixed(1)}, ${cycleCount})">
           Inspect 🔬
         </button>
       </td>

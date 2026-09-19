@@ -854,6 +854,14 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
         avg_damage = round(sum(s["prediction"] for s in samples) / len(samples), 4)
         avg_hours = round(sum(s["remaining_hours"] for s in samples) / len(samples))
         
+        # Normalize fields: add canonical aliases expected by the frontend
+        for s in samples:
+            s.setdefault("damage_index", s.get("prediction", 0))
+            s.setdefault("cycle_count", s.get("cycles", 0))
+            s.setdefault("peak_stress_range_mpa", s.get("stress_range", s.get("max_stress", 0)))
+            s.setdefault("est_remaining_hours", s.get("remaining_hours", 0))
+            s.setdefault("recommended_action", s.get("notes", "—"))
+
         self.send_json({
             "summary": {
                 "total_files": len(samples),
