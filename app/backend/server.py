@@ -12,7 +12,7 @@ import re
 import io
 import traceback
 import urllib.parse
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, ThreadingHTTPServer, SimpleHTTPRequestHandler
 import numpy as np
 import pandas as pd
 from scipy import signal
@@ -711,7 +711,7 @@ def run_server(port=None):
     # In cloud environments (Cloud Run, Docker) bind to 0.0.0.0; locally bind to 127.0.0.1
     host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("CONTAINER") or os.environ.get("K_SERVICE") else "127.0.0.1")
     server_address = (host, port)
-    httpd = HTTPServer(server_address, DashboardRequestHandler)
+    httpd = ThreadingHTTPServer(server_address, DashboardRequestHandler)
     print(f"\n[★] NebulaX Rail Corrugation Dashboard running at: http://{host}:{port}")
     httpd.serve_forever()
 

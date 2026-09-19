@@ -1,5 +1,9 @@
 # Exclude heavy raw datasets (5.5 GB) - model bundle and test files are tracked
 data/Train/
+data/Test/*.csv
+!data/Test/Test1.csv
+!data/Test/Test2.csv
+!data/Test/Test11.csv
 data/train_features.csv
 .git/
 .gitignore

@@ -1,18 +1,14 @@
 .gcloudignore
 .git
 .gitignore
-
-# Exclude large training datasets (multi-gigabytes) - model is already saved in models/
 data/Train/
+data/Test/*.csv
+!data/Test/Test1.csv
+!data/Test/Test2.csv
+!data/Test/Test11.csv
 data/train_features.csv
-
-# Python byte code
-__pycache__/
-*.py[cod]
-*$py.class
-
-# IDE & system
-.DS_Store
-.vscode/
-.idea/
+Optional_Items/
 *.log
+venv/
+__pycache__/
+*.pyc

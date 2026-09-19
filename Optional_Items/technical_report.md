@@ -16,6 +16,7 @@ This solution delivers a physics-informed, machine-learning-driven condition mon
 2. Decomposes 128 multi-channel axle-box vibration and shock accelerometers across 8 cars into independent bilateral rail states: **Side I** (odd positions 1, 3, 5, 7) and **Side II** (even positions 2, 4, 6, 8).
 3. Overcomes severe class imbalance (86% Normal, 5% Side I, 9% Side II) using cost-sensitive Histogram Gradient Boosting + Balanced Logistic Regression blending, achieving an Out-of-Fold **Macro F1 of 0.8507**.
 4. Provides an interactive web application featuring an 8-car train digital twin with 64-wheel live heatmaps, dynamic spectral analysis, and 1-click submission export.
+5. Deployed live on **Google Cloud Run** in Singapore (`asia-southeast1`): [https://nebula-rail-twin-515716532383.asia-southeast1.run.app](https://nebula-rail-twin-515716532383.asia-southeast1.run.app).
 
 ---
 
