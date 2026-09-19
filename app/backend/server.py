@@ -44,8 +44,12 @@ MODEL_BUNDLE = None
 def get_model():
     global MODEL_BUNDLE
     if MODEL_BUNDLE is None and os.path.exists(MODEL_PATH):
-        with open(MODEL_PATH, "rb") as f:
-            MODEL_BUNDLE = pickle.load(f)
+        try:
+            with open(MODEL_PATH, "rb") as f:
+                MODEL_BUNDLE = pickle.load(f)
+        except Exception as e:
+            print(f"[!] Warning: failed to load {MODEL_PATH}: {e}")
+            MODEL_BUNDLE = None
     return MODEL_BUNDLE
 
 
@@ -510,7 +514,6 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
         self.send_json(accuracy_payload)
 
     def handle_api_predictions(self):
-        bundle = get_model()
         pred_detailed_path = os.path.join(SUBMISSION_DIR, "rail_predictions_detailed.csv")
         all_preds = []
         if os.path.exists(pred_detailed_path):
