@@ -20,6 +20,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application, champion model, and test predictions
 COPY src/ ./src/
 COPY models/ ./models/
+COPY shm_model/ ./shm_model/
+COPY model/ ./model/
+COPY Trial-and-Error-NebulaX--main/ ./Trial-and-Error-NebulaX--main/
+COPY PS3/ ./PS3/
 COPY app/ ./app/
 COPY submission/ ./submission/
 COPY predict.py .
