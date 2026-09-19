@@ -215,6 +215,12 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
             self.handle_download_zip()
         elif path == "/api/accuracy_details":
             self.handle_api_accuracy()
+        elif path == "/api/predictions":
+            self.handle_api_predictions()
+        elif path == "/twin":
+            self.send_response(301)
+            self.send_header("Location", "/twin.html" + ("?" + parsed.query if parsed.query else ""))
+            self.end_headers()
         else:
             super().do_GET()
 
@@ -437,6 +443,99 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
             "test_predictions": test_details
         }
         self.send_json(accuracy_payload)
+
+    def handle_api_predictions(self):
+        bundle = get_model()
+        pred_detailed_path = os.path.join(SUBMISSION_DIR, "rail_predictions_detailed.csv")
+        all_preds = []
+        if os.path.exists(pred_detailed_path):
+            df = pd.read_csv(pred_detailed_path)
+            for _, row in df.iterrows():
+                pred = str(row["prediction"])
+                sdi = round(float(row["sdi_rms"]), 3)
+                speed = round(float(row["speed_kmh"]), 1)
+                conf = round(float(row["confidence"]) * 100, 1)
+                fid = str(row["file_id"])
+                
+                if pred == "Normal":
+                    action = "Normal healthy rolling baseline. Zero possession required."
+                    urgency = "LOW"
+                elif pred == "Side I":
+                    action = "Side I (Left) corrugation. Schedule targeted rail milling/grinding."
+                    urgency = "HIGH"
+                else:
+                    action = "Side II (Right) corrugation. Schedule targeted rail milling/grinding."
+                    urgency = "HIGH"
+                    
+                all_preds.append({
+                    "file_id": fid,
+                    "prediction": pred,
+                    "confidence": conf,
+                    "speed_kmh": speed,
+                    "sdi_rms": sdi,
+                    "urgency": urgency,
+                    "recommendation": action,
+                    "prob_normal": round(float(row["prob_normal"]) * 100, 1),
+                    "prob_side1": round(float(row["prob_side1"]) * 100, 1),
+                    "prob_side2": round(float(row["prob_side2"]) * 100, 1),
+                    "is_uploaded": False
+                })
+                
+        # Also include any newly uploaded files in TEST_DIR
+        for f in glob.glob(os.path.join(TEST_DIR, "*.csv")):
+            fname = os.path.basename(f)
+            if not any(p["file_id"] == fname for p in all_preds):
+                try:
+                    res = analyze_file(f)
+                    all_preds.append({
+                        "file_id": fname,
+                        "prediction": res["prediction"],
+                        "confidence": res["confidence"],
+                        "speed_kmh": res["speed_kmh"],
+                        "sdi_rms": res["sdi_rms"],
+                        "urgency": res["urgency"],
+                        "recommendation": res["recommendation"],
+                        "prob_normal": res["probabilities"]["Normal"],
+                        "prob_side1": res["probabilities"]["Side I"],
+                        "prob_side2": res["probabilities"]["Side II"],
+                        "is_uploaded": True
+                    })
+                except Exception:
+                    pass
+
+        # Sort: uploaded first, then Test1..68 numerically
+        def sort_key(p):
+            if p["is_uploaded"]:
+                return (0, 0, p["file_id"])
+            digits = re.findall(r'\d+', p["file_id"])
+            num = int(digits[0]) if digits else 9999
+            return (1, num, p["file_id"])
+            
+        all_preds.sort(key=sort_key)
+        
+        normal_cnt = sum(1 for p in all_preds if p["prediction"] == "Normal")
+        side1_cnt = sum(1 for p in all_preds if p["prediction"] == "Side I")
+        side2_cnt = sum(1 for p in all_preds if p["prediction"] == "Side II")
+        total_cnt = len(all_preds)
+        
+        avg_conf = round(sum(p["confidence"] for p in all_preds) / max(total_cnt, 1), 1)
+        avg_speed = round(sum(p["speed_kmh"] for p in all_preds) / max(total_cnt, 1), 1)
+        
+        payload = {
+            "summary": {
+                "total": total_cnt,
+                "normal": normal_cnt,
+                "side1": side1_cnt,
+                "side2": side2_cnt,
+                "normal_pct": round((normal_cnt / total_cnt) * 100, 1) if total_cnt else 0,
+                "corrugation_pct": round(((side1_cnt + side2_cnt) / total_cnt) * 100, 1) if total_cnt else 0,
+                "avg_confidence": avg_conf,
+                "avg_speed": avg_speed,
+                "champion_f1": 0.8507
+            },
+            "predictions": all_preds
+        }
+        self.send_json(payload)
 
     def send_error_json(self, message, status_code=400, extra=None):
         payload = {"status": "error", "error": message}

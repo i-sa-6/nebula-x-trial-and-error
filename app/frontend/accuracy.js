@@ -99,7 +99,7 @@ function renderTable() {
         <td class="mono-val">${row.speed_kmh} km/h</td>
         <td class="mono-val" style="color: ${sdiColor};">${row.sdi_rms > 0 ? '+' : ''}${row.sdi_rms}</td>
         <td>
-          <a href="index.html?file=${encodeURIComponent(row.file_id)}" class="btn-inspect" title="Inspect live sensor waveforms and digital twin for this recording">
+          <a href="twin.html?file=${encodeURIComponent(row.file_id)}" class="btn-inspect" title="Inspect live sensor waveforms and digital twin for this recording">
             Inspect in Digital Twin ↗
           </a>
         </td>

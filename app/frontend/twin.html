@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NebulaX - Train Condition Monitoring (Rail Corrugation Diagnostic System)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">🚆</div>
+      <div class="brand-text">
+        <h1>NEBULA-X <span class="badge-subsystem">PS3: Rail Corrugation</span></h1>
+        <p class="brand-tagline">Singapore Land Transport Authority (LTA) — Automated Train Condition Monitoring</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <a href="index.html" class="nav-tab">📋 Predictions Overview</a>
+      <a href="twin.html" class="nav-tab active">🚆 Live Diagnostic Twin</a>
+      <a href="accuracy.html" class="nav-tab">📊 Model Accuracy</a>
+    </nav>
+
+    <!-- Integrated Clean Selector in Header -->
+    <div class="nav-center-controls">
+      <label for="fileSelect" class="select-label">Recording:</label>
+      <select id="fileSelect" class="styled-select">
+        <option value="">Loading files...</option>
+      </select>
+    </div>
+
+    <div class="nav-badges">
+      <div class="metric-pill highlight">
+        <span class="pill-label">MACRO F1</span>
+        <span class="pill-value" id="modelF1">0.8507</span>
+      </div>
+      <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+      <button id="btnUploadCsv" class="btn btn-primary" title="Upload a test.csv file to validate all 129 physical parameters and run live diagnostics">
+        <span class="btn-icon">📤</span> Upload Test CSV
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+    
+    <!-- 1. 8-Car Train Digital Twin Schematic -->
+    <section class="glass-panel digital-twin-card">
+      <div class="panel-header">
+        <div>
+          <h3>8-CAR TRAIN DIGITAL TWIN SCHEMATIC</h3>
+          <p class="panel-desc">Axle-box vibration intensity across 64 wheelsets (Cars 1–8, Positions 1–8)</p>
+        </div>
+        <div class="legend-container">
+          <div class="legend">
+            <span class="legend-item"><span class="dot dot-green"></span> Baseline (&lt;0.65 m/s²)</span>
+            <span class="legend-item"><span class="dot dot-amber"></span> Moderate Dynamic (0.65–1.20 m/s²)</span>
+            <span class="legend-item"><span class="dot dot-red"></span> Severe Corrugation (&gt;1.20 m/s²)</span>
+          </div>
+          <button id="btnToggleThresholdInfo" class="threshold-info-btn" title="Learn why thresholds are calibrated at 1.20 m/s² instead of 10.5 m/s²">
+            <span>🔬 Threshold Physics &amp; Standards</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Train Track Schematic Layout -->
+      <div class="train-schematic-wrapper">
+        <div class="rail-indicator top-rail">SIDE I RAIL (Odd Wheels: 1, 3, 5, 7)</div>
+        <div class="train-consist" id="trainConsist">
+          <!-- Dynamically populated 8 cars -->
+        </div>
+        <div class="rail-indicator bottom-rail">SIDE II RAIL (Even Wheels: 2, 4, 6, 8)</div>
+      </div>
+      <div class="wheel-inspect-bar" id="wheelInspectBar">
+        Hover over any axle-box wheel above to inspect its live RMS vibration and shock readings.
+      </div>
+
+      <!-- Engineering Threshold Calibration Rationale -->
+      <div class="threshold-explanation-card" id="thresholdExplanationCard">
+        <div class="threshold-header">
+          <div class="threshold-title">
+            <span class="icon">🔬</span>
+            <strong>OPERATIONAL CALIBRATION: WHY &gt;1.20 m/s² INSTEAD OF &gt;10.5 m/s²?</strong>
+          </div>
+          <span class="threshold-badge">ISO 10816 / UIC 518 / EN 14363 Standards</span>
+        </div>
+
+        <div class="threshold-grid">
+          <div class="threshold-col">
+            <div class="col-badge baseline-badge">🟢 Baseline (&lt;0.65 m/s² | &lt;0.066 g)</div>
+            <p><strong>Smooth Continuous Welded Rail (CWR):</strong> Normal rolling noise on healthy Singapore MRT track. Primary suspension isolates vibration effortlessly. Zero structural fatigue.</p>
+          </div>
+          <div class="threshold-col">
+            <div class="col-badge moderate-badge">🟡 Moderate (0.65–1.20 m/s² | 0.07–0.12 g)</div>
+            <p><strong>Dynamic Track Response:</strong> Mild acoustic roughness, sleeper passing transitions, or curve hunting. Passenger ride index remains compliant; no immediate track repair required.</p>
+          </div>
+          <div class="threshold-col">
+            <div class="col-badge severe-badge">🔴 Severe Corrugation (&gt;1.20 m/s² | &gt;0.12 g)</div>
+            <p><strong>Abnormal Periodic Resonance:</strong> Sustained vibration triples baseline energy. Fastening clips fatigue, ballast pulverizes, and in-cabin noise exceeds 75 dBA. Triggers Level 2 rail grinding possession.</p>
+          </div>
+        </div>
+
+        <div class="threshold-critical-callout">
+          <strong>⚠️ Why not &gt;10.5 m/s²?</strong>
+          Standard gravity is <em>g = 9.81 m/s²</em>. Sustained vibration of <strong>10.5 m/s² (1.07 g)</strong> causes <strong>Wheel Unloading (Q &le; 0)</strong> under UIC 518 where wheels literally lift off the rail head, causing acute derailment! Real-world corrugation wear (0.05–0.25 mm micro-ripples) produces <strong>1.3 – 2.8 m/s² continuous RMS</strong>. If calibrated at &gt;10.5 m/s², every damaged rail would falsely appear green until catastrophic failure.
+        </div>
+      </div>
+
+      <!-- ELI5 Simple Explanation -->
+      <div class="eli5-box">
+        <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
+        <div class="eli5-text">
+          <strong>What are we looking at?</strong> Think of this as a toy train with <strong>64 wheels</strong>! 
+          🟢 <strong>Green wheels</strong> are rolling super smoothly. 
+          🟡 <strong>Yellow wheels</strong> feel small bumps on the track. 
+          🔴 <strong>Red wheels</strong> are hitting rough, wavy metal ripples (called <em>corrugation</em>) that shake the train! 
+          Top row wheels ride on the <strong>Left Rail (Side I)</strong>, and bottom row wheels ride on the <strong>Right Rail (Side II)</strong>. If only one row turns red, we know exactly which rail is bumpy!
+          <br><br>
+          🤔 <strong>Why does the red warning turn on at 1.2 and not 10?</strong> Because 10 is as strong as Earth's gravity! If the train shook at 10, the wheels would literally float in the air and crash! The wavy ripples on the rails are tiny (thinner than a fingernail), so catching them early at 1.2 lets engineers grind them smooth weeks before they ever become dangerous.
+          <br><br>
+          📤 <strong>Testing your own train file?</strong> Click the blue <strong>Upload Test CSV</strong> button in the top bar! The system will check all 129 physical parameters first; if everything checks out, it joins the test pool and lights up on the train schematic instantly!
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Recommended Actions & Diagnostic Verdict -->
+    <section class="glass-panel recommendation-card">
+      <div class="verdict-banner">
+        <div class="verdict-badge-group">
+          <div class="verdict-icon" id="verdictIcon">🔍</div>
+          <div>
+            <div class="verdict-title" id="verdictTitle">AWAITING SELECTION</div>
+            <div class="verdict-subtitle" id="verdictSubtitle">Select a recording above to run real-time diagnostics</div>
+          </div>
+        </div>
+        <div class="verdict-meta">
+          <span class="confidence-tag" id="confidenceVal">Confidence: --%</span>
+          <span class="urgency-badge" id="urgencyBadge">READY</span>
+        </div>
+      </div>
+
+      <div class="action-box">
+        <div class="action-header">
+          <span class="action-icon">📋</span>
+          <h4>RECOMMENDED ACTIONS (LTA Track Maintenance Division)</h4>
+          <span id="streamBadge" class="stream-meta-badge" style="display:none;">⚡ STREAMING</span>
+        </div>
+        <div class="recommendation-content" id="recommendationText">
+          Select a test file to generate engineering maintenance instructions based on localized wheelset vibrations.
+        </div>
+      </div>
+
+      <!-- ELI5 Simple Explanation -->
+      <div class="eli5-box">
+        <span class="eli5-badge">👶 Simple 5-Year-Old Guide</span>
+        <div class="eli5-text">
+          <strong>What does this do?</strong> This is the <strong>AI Train Doctor's Prescription</strong>! 
+          Instead of making humans guess, our smart robot listens to all 64 wheels at once. If the tracks are smooth, it gives a big thumbs up (<strong>Normal</strong>). If it spots bumpy waves on the Left or Right rail, it tells the railway repair crew exactly where to send the giant rail grinding machine to iron out the bumpy metal waves!
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
