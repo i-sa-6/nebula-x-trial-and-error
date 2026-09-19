@@ -215,6 +215,24 @@ body::before {
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
 }
 
+.btn-primary {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary);
+  color: #000;
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
 /* Dashboard Container */
 .dashboard-container {
   padding: 2rem 2.5rem;

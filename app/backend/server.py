@@ -8,6 +8,9 @@ import json
 import glob
 import pickle
 import zipfile
+import re
+import io
+import traceback
 import urllib.parse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import numpy as np
@@ -223,7 +226,8 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/batch_inference":
             self.handle_batch_inference()
         elif parsed.path == "/api/upload":
-            self.handle_file_upload()
+            query = urllib.parse.parse_qs(parsed.query)
+            self.handle_file_upload(query)
         else:
             self.send_error(404, "Endpoint not found")
 
@@ -245,10 +249,26 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
         self.send_json(status)
 
     def handle_api_files(self):
-        test_files = sorted([os.path.basename(p) for p in glob.glob(os.path.join(TEST_DIR, "*.csv"))],
-                            key=lambda x: int(x.replace("Test", "").replace(".csv", "")) if x.replace("Test", "").replace(".csv", "").isdigit() else x)
+        all_csvs = [os.path.basename(p) for p in glob.glob(os.path.join(TEST_DIR, "*.csv"))]
+        test_files = []
+        uploaded_files = []
+        
+        for f in all_csvs:
+            name_part = f.replace(".csv", "")
+            if name_part.startswith("Test") and name_part[4:].isdigit() and int(name_part[4:]) <= 68:
+                test_files.append(f)
+            else:
+                uploaded_files.append(f)
+                
+        test_files.sort(key=lambda x: int(x.replace("Test", "").replace(".csv", "")))
+        uploaded_files.sort()
+        
         train_samples = ["Train1.csv (Normal)", "Train62.csv (Side I Defect)", "Train2.csv (Side II Defect)"]
-        self.send_json({"test_files": test_files, "train_samples": train_samples})
+        self.send_json({
+            "test_files": test_files,
+            "uploaded_files": uploaded_files,
+            "train_samples": train_samples
+        })
 
     def handle_api_predict(self, fname):
         clean_name = fname.split(" ")[0] # in case of Train1.csv (Normal)
@@ -418,24 +438,135 @@ class DashboardRequestHandler(SimpleHTTPRequestHandler):
         }
         self.send_json(accuracy_payload)
 
-    def handle_file_upload(self):
-        content_length = int(self.headers.get('Content-Length', 0))
-        body = self.rfile.read(content_length)
-        
-        # Save temp file
-        temp_path = os.path.join(DATA_DIR, "uploaded_temp.csv")
-        # Find raw csv data from form-data or raw body
-        if b"Rotating speed" in body:
-            start_idx = body.find(b"Rotating speed")
-            end_idx = body.rfind(b"\n")
-            with open(temp_path, "wb") as f:
-                f.write(body[start_idx:end_idx+1])
-        else:
-            with open(temp_path, "wb") as f:
-                f.write(body)
+    def send_error_json(self, message, status_code=400, extra=None):
+        payload = {"status": "error", "error": message}
+        if extra:
+            payload.update(extra)
+        data = json.dumps(payload).encode("utf-8")
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def handle_file_upload(self, query):
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length <= 0:
+                self.send_error_json("No file payload received in upload request.")
+                return
                 
-        result = analyze_file(temp_path)
-        self.send_json(result)
+            body = self.rfile.read(content_length)
+            
+            # Resolve requested filename
+            filename = query.get("filename", ["test.csv"])[0]
+            header_fn = self.headers.get("X-Filename")
+            if header_fn:
+                filename = header_fn
+                
+            # Check for multipart/form-data
+            content_type = self.headers.get("Content-Type", "")
+            if "multipart/form-data" in content_type:
+                fn_match = re.search(r'filename="([^"]+)"', body[:2048].decode("utf-8", errors="ignore"))
+                if fn_match:
+                    filename = fn_match.group(1)
+                header_end = body.find(b"\r\n\r\n")
+                if header_end != -1:
+                    boundary_end = body.rfind(b"\r\n--")
+                    if boundary_end > header_end:
+                        csv_bytes = body[header_end + 4 : boundary_end]
+                    else:
+                        csv_bytes = body[header_end + 4 :]
+                else:
+                    csv_bytes = body
+            else:
+                csv_bytes = body
+                
+            # Sanitize filename
+            filename = os.path.basename(filename).strip()
+            if not filename.lower().endswith(".csv"):
+                filename += ".csv"
+            filename = re.sub(r'[^a-zA-Z0-9._-]', '_', filename)
+            if not filename or filename == ".csv":
+                filename = "test_uploaded.csv"
+                
+            # Parse CSV
+            try:
+                df = pd.read_csv(io.BytesIO(csv_bytes))
+            except Exception as e:
+                self.send_error_json(f"Invalid CSV structure: Could not parse CSV data ({str(e)})")
+                return
+                
+            if len(df) < 50:
+                self.send_error_json(f"Insufficient sample length ({len(df)} rows). Automated rail corrugation diagnostics requires at least 50 continuous telemetry samples.")
+                return
+                
+            # Clean column names (strip whitespace and BOM)
+            df.columns = [str(c).strip().lstrip('\ufeff') for c in df.columns]
+            
+            # 129 Required Railway Channels Specification
+            required_channels = ["Rotating speed"]
+            for car in range(1, 9):
+                for pos in range(1, 9):
+                    required_channels.append(f"Vibration of bearing in position {pos} of car {car}")
+                    required_channels.append(f"Shock of bearing in position {pos} of car {car}")
+                    
+            existing_cols = set(df.columns)
+            missing = [c for c in required_channels if c not in existing_cols]
+            
+            if missing:
+                sample_missing = missing[:5]
+                err_msg = f"Parameter validation failed: Missing {len(missing)} of 129 required physical channels. (e.g. {', '.join(sample_missing)})"
+                self.send_error_json(
+                    err_msg, 
+                    status_code=400,
+                    extra={
+                        "missing_count": len(missing), 
+                        "expected_channels": 129, 
+                        "found_channels": len(df.columns), 
+                        "missing_samples": sample_missing
+                    }
+                )
+                return
+                
+            # Verify numeric sensor data
+            try:
+                for c in required_channels:
+                    df[c] = pd.to_numeric(df[c], errors='coerce')
+                nan_cols = [c for c in required_channels if df[c].isna().all()]
+                if nan_cols:
+                    self.send_error_json(f"Parameter validation failed: Channels contain purely non-numeric or empty values: {', '.join(nan_cols[:4])}")
+                    return
+            except Exception as e:
+                self.send_error_json(f"Numeric validation error: {str(e)}")
+                return
+                
+            # Fill small isolated NaNs
+            df.fillna(0.0, inplace=True)
+            
+            # Save validated file into test pool directory
+            save_path = os.path.join(TEST_DIR, filename)
+            df.to_csv(save_path, index=False)
+            
+            # Clear cache for this file if previously analyzed
+            ANALYSIS_CACHE.pop(filename, None)
+            
+            # Pre-warm analysis immediately
+            result = analyze_file(save_path)
+            
+            self.send_json({
+                "status": "success",
+                "filename": filename,
+                "message": f"Parameters verified! All 129 physical channels checked across {len(df)} samples.",
+                "total_channels": len(df.columns),
+                "total_samples": len(df),
+                "result": result
+            })
+        except Exception as e:
+            traceback.print_exc()
+            self.send_error_json(f"Server error during file processing: {str(e)}", status_code=500)
 
     def send_json(self, data):
         payload = json.dumps(data).encode("utf-8")

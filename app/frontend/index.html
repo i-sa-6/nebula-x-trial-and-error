@@ -39,8 +39,9 @@
         <span class="pill-label">MACRO F1</span>
         <span class="pill-value" id="modelF1">0.8507</span>
       </div>
-      <button id="btnDownloadZip" class="btn btn-success" title="Download official competition predictions.zip">
-        <span class="btn-icon">📦</span> Download predictions.zip
+      <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+      <button id="btnUploadCsv" class="btn btn-primary" title="Upload a test.csv file to validate all 129 physical parameters and run live diagnostics">
+        <span class="btn-icon">📤</span> Upload Test CSV
       </button>
     </div>
   </header>
@@ -83,6 +84,8 @@
           🟡 <strong>Yellow wheels</strong> feel small bumps on the track. 
           🔴 <strong>Red wheels</strong> are hitting rough, wavy metal ripples (called <em>corrugation</em>) that shake the train! 
           Top row wheels ride on the <strong>Left Rail (Side I)</strong>, and bottom row wheels ride on the <strong>Right Rail (Side II)</strong>. If only one row turns red, we know exactly which rail is bumpy!
+          <br><br>
+          📤 <strong>Testing your own train file?</strong> Click the blue <strong>Upload Test CSV</strong> button in the top bar! The system will check all 129 physical parameters first; if everything checks out, it joins the test pool and lights up on the train schematic instantly!
         </div>
       </div>
     </section>

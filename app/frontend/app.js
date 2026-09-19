@@ -66,9 +66,25 @@ async function loadFileList() {
     const data = await res.json();
     const select = document.getElementById('fileSelect');
     if (!select) return;
+    
+    const prevVal = select.value;
     select.innerHTML = '';
     
-    // Test Files group
+    // 1. Uploaded Test Pool (if any files uploaded)
+    if (data.uploaded_files && data.uploaded_files.length > 0) {
+      const optGroupUpload = document.createElement('optgroup');
+      optGroupUpload.label = '── 📤 Uploaded Test Pool ──';
+      optGroupUpload.setAttribute('data-group', 'uploaded');
+      data.uploaded_files.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.textContent = `📤 ${f} (Verified)`;
+        optGroupUpload.appendChild(opt);
+      });
+      select.appendChild(optGroupUpload);
+    }
+
+    // 2. Official Held-out Test Set
     const optGroupTest = document.createElement('optgroup');
     optGroupTest.label = '── Held-out Test Set (68 Files) ──';
     data.test_files.forEach(f => {
@@ -79,7 +95,7 @@ async function loadFileList() {
     });
     select.appendChild(optGroupTest);
 
-    // Train Samples group
+    // 3. Train Samples
     const optGroupTrain = document.createElement('optgroup');
     optGroupTrain.label = '── Known Ground-Truth Samples ──';
     data.train_samples.forEach(f => {
@@ -89,6 +105,15 @@ async function loadFileList() {
       optGroupTrain.appendChild(opt);
     });
     select.appendChild(optGroupTrain);
+
+    if (prevVal) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === prevVal) {
+          select.value = prevVal;
+          break;
+        }
+      }
+    }
   } catch (err) {
     console.error('File list fetch error:', err);
   }
@@ -108,13 +133,124 @@ function setupEventListeners() {
     });
   }
 
-  // Download Zip
+  // Upload Test CSV button & input
+  const btnUpload = document.getElementById('btnUploadCsv');
+  const fileInput = document.getElementById('csvFileInput');
+  if (btnUpload && fileInput) {
+    btnUpload.addEventListener('click', () => {
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+  }
+
+  // Drag and drop support on the train schematic panel
+  const dropZone = document.querySelector('.digital-twin-card');
+  if (dropZone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.style.borderColor = 'var(--primary)';
+        dropZone.style.boxShadow = '0 0 25px var(--primary-glow)';
+      });
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.style.borderColor = '';
+        dropZone.style.boxShadow = '';
+      });
+    });
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        handleFileUpload(dt.files[0]);
+      }
+    });
+  }
+
+  // Download Zip (if present on page)
   const btnZip = document.getElementById('btnDownloadZip');
   if (btnZip) {
     btnZip.addEventListener('click', () => {
       window.location.href = '/api/download_predictions';
       showToast('📦 Downloading official predictions.zip...');
     });
+  }
+}
+
+/**
+ * Uploads a test.csv file, validates all 129 physical channels on the backend,
+ * and if valid, adds it to the test pool dropdown and immediately renders it on the train schematic.
+ */
+async function handleFileUpload(file) {
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    alert('Invalid file format: Please upload a railway telemetry file ending in .csv');
+    return;
+  }
+
+  const uploadBtn = document.getElementById('btnUploadCsv');
+  const originalBtnHtml = uploadBtn ? uploadBtn.innerHTML : '';
+  if (uploadBtn) {
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<span class="btn-icon">⏳</span> Validating 129 Channels...';
+  }
+
+  showToast(`Uploading and validating 129 physical channels for ${file.name}...`);
+
+  try {
+    const url = `/api/upload?filename=${encodeURIComponent(file.name)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/csv'
+      },
+      body: file
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.status !== 'success') {
+      const errorMsg = data.error || 'Parameter validation failed.';
+      let extraInfo = '';
+      if (data.missing_samples && data.missing_samples.length > 0) {
+        extraInfo = `\n\nExample missing channels:\n- ${data.missing_samples.join('\n- ')}`;
+      }
+      alert(`❌ Railway Parameter Check Failed:\n\n${errorMsg}${extraInfo}`);
+      showToast(`Validation failed for ${file.name}`);
+      return;
+    }
+
+    const uploadedFilename = data.filename;
+    showToast(`✅ ${uploadedFilename}: All 129 physical parameters verified!`);
+
+    // Refresh file list to include the verified file in the test pool
+    await loadFileList();
+
+    const select = document.getElementById('fileSelect');
+    if (select) {
+      select.value = uploadedFilename;
+    }
+
+    // Immediately trigger analysis, schematic render, and AI token streaming
+    analyzeFile(uploadedFilename);
+  } catch (err) {
+    console.error('Upload error:', err);
+    alert(`Upload request failed: ${err.message}`);
+  } finally {
+    if (uploadBtn) {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = originalBtnHtml;
+    }
+    const fileInput = document.getElementById('csvFileInput');
+    if (fileInput) fileInput.value = '';
   }
 }
 
